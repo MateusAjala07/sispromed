@@ -25,8 +25,8 @@ export default function Login() {
         <section className="flex flex-col justify-center items-center">
           <HeartPulse className="w-14 h-14 bg-primary text-primary-foreground p-3 rounded-full" />
           <div className="mt-3">
-            <h1 className="text-zinc-800 tracking-tight text-3xl font-bold leading-tight">
-              Bem-vindo de volta!
+            <h1 className="text-zinc-800 text-center tracking-tight text-3xl font-bold leading-tight">
+              Bem-vindo
             </h1>
             <h2 className="text-zinc-600 text-base font-normal leading-normal pt-1">
               Insira suas credenciais para continuar.
