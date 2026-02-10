@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeClosed, HeartPulse } from "lucide-react";
+import { Eye, EyeClosed, HeartPulse, Loader2 } from "lucide-react";
 import { GoogleLogin } from "@react-oauth/google";
 import clinica from "@/assets/images/clinica.svg";
 import { useNavigate } from "react-router";
@@ -34,6 +34,7 @@ export default function Login() {
 
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
     try {
+      await new Promise((r) => setTimeout(r, 1000)); // tirar depois
       console.log(data);
       navigate("/agenda");
     } catch (error) {
@@ -103,7 +104,13 @@ export default function Login() {
                 type="submit"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? "Carregando..." : "Entrar"}
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="animate-spin" /> Carregando...
+                  </>
+                ) : (
+                  "Entrar"
+                )}
               </Button>
             </section>
             {errors.root && (
@@ -114,14 +121,14 @@ export default function Login() {
               <span className="text-sm text-zinc-400">OU</span>
               <hr className="w-full border-zinc-300" />
             </section>
-            <section>
+            {/* <section>
               <GoogleLogin
                 onSuccess={(credentialResponse) => {
                   console.log(credentialResponse);
                 }}
                 onError={() => console.error("Login failed")}
               />
-            </section>
+            </section> */}
           </form>
         </section>
       </main>
