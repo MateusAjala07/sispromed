@@ -1,6 +1,15 @@
 import axios from "axios";
 import { getAccessToken, setAccessToken, clearAccessToken } from "./auth";
 import type { Acompanhamento } from "@/components/Acompanhamentos/columns";
+import type { Convenio } from "@/types/convenio";
+import type { Paciente } from "@/types/paciente";
+import type { Clinica } from "@/types/clinica";
+import type { Medico } from "@/types/medico";
+import type { FormFieldsAcompanhamento } from "@/components/Modals/acompanhamento";
+import type { TipoAcesso } from "@/types/tipoAcesso";
+import type { Lesao } from "@/types/lesao";
+import type { TratamentoRealizado } from "@/types/tratamentoRealizado";
+import type { Cateter } from "@/types/cateter";
 
 export const api = axios.create({
   baseURL: "http://localhost:8086",
@@ -17,9 +26,12 @@ api.interceptors.request.use((config: any) => {
   return config;
 });
 
+let isRefreshing = false;
+let refreshPromise: Promise<string> | null = null;
+
 api.interceptors.response.use(
-  (response: any) => response,
-  async (error: any) => {
+  (response) => response,
+  async (error) => {
     const originalRequest = error.config;
 
     if (!error.response || error.response.status !== 401) {
@@ -33,19 +45,28 @@ api.interceptors.response.use(
     }
 
     if (originalRequest._retry) {
-      clearAccessToken();
-      window.location.href = "/login";
       return Promise.reject(error);
     }
 
     originalRequest._retry = true;
 
     try {
-      const { data } = await api.post("/refresh");
+      if (!isRefreshing) {
+        isRefreshing = true;
 
-      const newAccessToken = data.access_token;
+        refreshPromise = api
+          .post("/refresh")
+          .then(({ data }) => {
+            const newAccessToken = data.access_token;
+            setAccessToken(newAccessToken);
+            return newAccessToken;
+          })
+          .finally(() => {
+            isRefreshing = false;
+          });
+      }
 
-      setAccessToken(newAccessToken);
+      const newAccessToken = await refreshPromise;
 
       originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
@@ -84,5 +105,105 @@ export const efetuarLogout = async () => {
 
 export const consultarAcompanhamentos = async (): Promise<Acompanhamento[]> => {
   const { data } = await api.get("/acompanhamentos");
+  return data;
+};
+
+export const consultarAcompanhamento = async (
+  id: number
+): Promise<Acompanhamento> => {
+  const { data } = await api.get(`/acompanhamentos/${id}`);
+  return data;
+};
+
+export const criarAcompanhamento = async (
+  body: FormFieldsAcompanhamento
+): Promise<object> => {
+  const { data } = await api.post("/acompanhamentos", body);
+  return data;
+};
+
+export const editarAcompanhamento = async (
+  id: number,
+  body: FormFieldsAcompanhamento
+): Promise<object> => {
+  const { data } = await api.put(`/acompanhamentos/${id}`, body);
+  return data;
+};
+
+export const excluirAcompanhamento = async (id: number): Promise<object> => {
+  const { data } = await api.delete(`/acompanhamentos/${id}`);
+  return data;
+};
+
+export const consultarPacientes = async (
+  search: string = ""
+): Promise<Paciente[]> => {
+  const { data } = await api.get("/pacientes", {
+    params: { search },
+  });
+  return data;
+};
+
+export const consultarClinicas = async (
+  search: string = ""
+): Promise<Clinica[]> => {
+  const { data } = await api.get("/clinicas", {
+    params: { search },
+  });
+  return data;
+};
+
+export const consultarConvenios = async (
+  search: string = ""
+): Promise<Convenio[]> => {
+  const { data } = await api.get("/convenios", {
+    params: { search },
+  });
+  return data;
+};
+
+export const consultarMedicos = async (
+  especialidade: number,
+  search: string = ""
+): Promise<Medico[]> => {
+  const { data } = await api.get("/medicos", {
+    params: { especialidade, search },
+  });
+  return data;
+};
+
+export const consultarTiposAcessos = async (
+  search: string = ""
+): Promise<TipoAcesso[]> => {
+  const { data } = await api.get("/tipos-acessos", {
+    params: { search },
+  });
+  return data;
+};
+
+export const consultarLesoes = async (
+  search: string = ""
+): Promise<Lesao[]> => {
+  const { data } = await api.get("/lesoes", {
+    params: { search },
+  });
+  return data;
+};
+
+export const consultarTratamentosRealizados = async (
+  search: string = ""
+): Promise<TratamentoRealizado[]> => {
+  const { data } = await api.get("/tratamentos-realizados", {
+    params: { search },
+  });
+  return data;
+};
+
+export const consultarCateteres = async (
+  search: string = ""
+): Promise<Cateter> => {
+  const { data } = await api.get("/cateteres", {
+    params: { search },
+  });
   return data;
 };

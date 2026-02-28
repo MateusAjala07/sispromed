@@ -120,9 +120,6 @@
   }
 }
 
-/* ==============================================
-   TOOLBAR
-   ============================================== */
 .rbc-toolbar {
   @apply bg-white border-b border-[#e5e5e5] px-5 py-3 text-[16px] font-medium text-[#444] flex items-center justify-between;
 }
@@ -144,16 +141,10 @@
   @apply rounded-md border border-[#e5e5e5];
 }
 
-/* ==============================================
-   HEADER DOS DIAS
-   ============================================== */
 .rbc-header {
   @apply bg-white py-3 font-medium text-[#777] border-b border-[#e5e5e5] text-center;
 }
 
-/* ==============================================
-   GRID / LINHAS
-   ============================================== */
 .rbc-month-view {
   @apply border-none;
 }
@@ -166,9 +157,6 @@
   @apply border-l border-[#eaeaea];
 }
 
-/* ==============================================
-   DIAS (números)
-   ============================================== */
 .rbc-button-link {
   @apply text-[#444] text-sm px-1 py-[2px] rounded;
 }
@@ -181,7 +169,6 @@
   @apply text-[#c5c5c5];
 }
 
-/* DIA ATUAL */
 .rbc-today {
   @apply bg-white border border-[#c8d8ff] shadow-inner;
 }
@@ -190,9 +177,6 @@
   @apply bg-[#c8d8ff] text-[#1a1a1a] rounded px-1;
 }
 
-/* ==============================================
-   EVENTOS
-   ============================================== */
 .rbc-event {
   @apply bg-[#e8f0fe] border-l-4 border-[#a7c1ff] text-[#28344a]
          px-2 py-[3px] text-sm rounded-md transition-colors;
@@ -206,9 +190,6 @@
   @apply bg-[#dbe7fd] border-l-[#8ab1ff];
 }
 
-/* ==============================================
-   AGENDA VIEW
-   ============================================== */
 .rbc-agenda-view,
 .rbc-agenda-content {
   @apply bg-white text-[#444];
@@ -223,9 +204,6 @@
   @apply bg-[#e8f0fe] border-l-4 border-[#a7c1ff] rounded px-3 py-2 font-medium;
 }
 
-/* ==============================================
-   TIME VIEW
-   ============================================== */
 .rbc-time-content,
 .rbc-timeslot-group,
 .rbc-time-slot,

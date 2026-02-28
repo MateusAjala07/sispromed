@@ -39,7 +39,7 @@ export default function Login() {
     try {
       const { email, senha } = data;
       await efetuarLogin(email, senha);
-      navigate("/agenda");
+      navigate("/vascular");
     } catch (error) {
       if (error instanceof AxiosError) {
         setError("root", {
