@@ -18,24 +18,20 @@ import {
 } from "@/components/ui/table";
 
 import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
-import React, { useState } from "react";
-import ModalAcompanhamento from "../Modals/acompanhamento";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import React from "react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  reload: () => Promise<void>;
+  emptyMessage: String;
 }
 
-export function DataTableAcompanhamentos<TData, TValue>({
+export function DataTable<TData, TValue>({
   columns,
   data,
-  reload,
+  emptyMessage = "Nenhum resultado encontrado.",
 }: DataTableProps<TData, TValue>) {
-  const [isModalAcompanhamento, setIsModalAcompanhamento] = useState(false);
-
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
@@ -53,28 +49,7 @@ export function DataTableAcompanhamentos<TData, TValue>({
   });
 
   return (
-    <div>
-      <ModalAcompanhamento
-        isOpen={isModalAcompanhamento}
-        setIsOpen={setIsModalAcompanhamento}
-        acao="criar"
-        reload={reload}
-      />
-      <div className="flex items-center py-3 justify-between">
-        <Input
-          placeholder="Filtrar pacientes..."
-          value={
-            (table.getColumn("paciente")?.getFilterValue() as string) ?? ""
-          }
-          onChange={(event) =>
-            table.getColumn("paciente")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-        <Button onClick={() => setIsModalAcompanhamento(true)}>
-          <Plus /> Adicionar
-        </Button>
-      </div>
+    <div className="w-full">
       <div className="overflow-hidden rounded-md border">
         <Table>
           <TableHeader>
@@ -118,7 +93,7 @@ export function DataTableAcompanhamentos<TData, TValue>({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  Nenhum acompanhamento.
+                  {emptyMessage}
                 </TableCell>
               </TableRow>
             )}

@@ -201,7 +201,7 @@ export const consultarTratamentosRealizados = async (
 
 export const consultarCateteres = async (
   search: string = ""
-): Promise<Cateter> => {
+): Promise<Cateter[]> => {
   const { data } = await api.get("/cateteres", {
     params: { search },
   });

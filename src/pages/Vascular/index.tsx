@@ -7,7 +7,7 @@ import { consultarAcompanhamentos } from "@/service/api";
 
 import { getColumns } from "@/components/Acompanhamentos/columns";
 
-export default function Vascular() {
+export default function Dashboard() {
   const [dataAcompanhamentos, setDataAcompanhamentos] = useState<
     Acompanhamento[]
   >([]);
@@ -23,7 +23,7 @@ export default function Vascular() {
 
   return (
     <section className="flex">
-      <div className="container mx-auto">
+      <div className="container mx-auto w-screen">
         <DataTableAcompanhamentos
           columns={getColumns(listarData)}
           data={dataAcompanhamentos}
