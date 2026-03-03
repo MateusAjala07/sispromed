@@ -27,13 +27,3 @@ export const ufs = [
   "SE",
   "BA",
 ];
-
-export function formatarCPF(value: string) {
-  const digits = (value ?? "").replace(/\D/g, "");
-
-  if (digits.length === 11) {
-    return digits.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
-  }
-
-  return value;
-}

@@ -13,7 +13,7 @@ import type { Acompanhamento } from "@/types/acompanhamento";
 import type { FormFieldsPaciente } from "@/components/Modals/paciente";
 
 export const api = axios.create({
-  baseURL: "http://10.1.1.190:8086",
+  baseURL: "http://localhost:8086",
   withCredentials: true,
 });
 
@@ -147,7 +147,7 @@ export const editarPaciente = async (
   id,
   body: FormFieldsPaciente
 ): Promise<object> => {
-  const { data } = await api.put("/pacientes", body);
+  const { data } = await api.put(`/pacientes/${id}`, body);
   return data;
 };
 
