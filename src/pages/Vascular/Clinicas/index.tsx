@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import FiltroTable from "@/components/filtro-table";
+import ModalClinica from "@/components/Modals/clinica";
 
 type StatusFiltro = "TODOS" | "NOME";
 
@@ -21,6 +22,7 @@ export default function Clinicas() {
   const [busca, setBusca] = useState("");
   const [acaoModal, setAcaoModal] = useState<"criar" | "editar">("criar");
   const [isModal, setIsModal] = useState(false);
+  const [itemID, setItemID] = useState(0);
   const [statusFiltro, setStatusFiltro] = useState<StatusFiltro>("TODOS");
 
   const columns: ColumnDef<Clinica>[] = [
@@ -43,7 +45,15 @@ export default function Clinicas() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>Editar</DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setAcaoModal("editar");
+                  setItemID(row.original.id);
+                  setIsModal(true);
+                }}
+              >
+                Editar
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -53,7 +63,10 @@ export default function Clinicas() {
 
   async function listar(busca: string = "", statusFiltro: string = "") {
     try {
-      const response = await consultarClinicas(busca?.toUpperCase(), statusFiltro);
+      const response = await consultarClinicas(
+        busca?.toUpperCase(),
+        statusFiltro
+      );
       setData(response);
     } catch (error) {
       toast.error(error?.message);
@@ -62,6 +75,14 @@ export default function Clinicas() {
 
   return (
     <>
+      <ModalClinica
+        acao={acaoModal}
+        isOpen={isModal}
+        setIsOpen={setIsModal}
+        reload={listar}
+        id={itemID}
+      />
+      
       <main>
         <section className="flex justify-between pb-1">
           <FiltroTable

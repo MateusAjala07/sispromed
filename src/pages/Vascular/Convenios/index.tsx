@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import FiltroTable from "@/components/filtro-table";
+import ModalConvenio from "@/components/Modals/convenio";
 
 type StatusFiltro = "TODOS" | "NOME";
 
@@ -20,6 +21,7 @@ export default function Convenios() {
   const [data, setData] = useState<Convenio[]>([]);
   const [busca, setBusca] = useState("");
   const [acaoModal, setAcaoModal] = useState<"criar" | "editar">("criar");
+  const [itemID, setItemID] = useState(0);
   const [isModal, setIsModal] = useState(false);
   const [statusFiltro, setStatusFiltro] = useState<StatusFiltro>("TODOS");
 
@@ -43,7 +45,15 @@ export default function Convenios() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>Editar</DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setAcaoModal("editar");
+                  setItemID(row.original.id);
+                  setIsModal(true);
+                }}
+              >
+                Editar
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -65,6 +75,13 @@ export default function Convenios() {
 
   return (
     <>
+      <ModalConvenio
+        acao={acaoModal}
+        isOpen={isModal}
+        setIsOpen={setIsModal}
+        reload={listar}
+        id={itemID}
+      />
       <main>
         <section className="flex justify-between pb-1">
           <FiltroTable

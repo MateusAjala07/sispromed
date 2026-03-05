@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import FiltroTable from "@/components/filtro-table";
+import ModalNefrologista from "@/components/Modals/nefrologista";
 
 type StatusFiltro = "TODOS" | "NOME";
 
@@ -22,6 +23,7 @@ export default function Tratamentos() {
   const [acaoModal, setAcaoModal] = useState<"criar" | "editar">("criar");
   const [isModal, setIsModal] = useState(false);
   const [statusFiltro, setStatusFiltro] = useState<StatusFiltro>("TODOS");
+  const [itemID, setItemID] = useState(0);
 
   const columns: ColumnDef<Tratamento>[] = [
     {
@@ -43,7 +45,15 @@ export default function Tratamentos() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>Editar</DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setAcaoModal("editar");
+                  setItemID(row.original.id);
+                  setIsModal(true);
+                }}
+              >
+                Editar
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -65,6 +75,13 @@ export default function Tratamentos() {
 
   return (
     <>
+      <ModalNefrologista
+        acao={acaoModal}
+        isOpen={isModal}
+        setIsOpen={setIsModal}
+        reload={listar}
+        id={itemID}
+      />
       <main>
         <section className="flex justify-between pb-1">
           <FiltroTable

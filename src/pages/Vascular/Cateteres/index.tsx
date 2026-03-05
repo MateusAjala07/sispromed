@@ -32,27 +32,6 @@ export default function Cateteres() {
       accessorKey: "marca",
       header: "Marca",
     },
-    {
-      id: "actions",
-      cell: ({ row }) => {
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="h-8 w-8 p-0 flex justify-self-end"
-              >
-                <span className="sr-only">Abrir menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>Editar</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
-      },
-    },
   ];
 
   async function listar(busca: string = "", statusFiltro: string = "") {
@@ -70,7 +49,7 @@ export default function Cateteres() {
   return (
     <>
       <main>
-        <section className="flex justify-between pb-1">
+        <section className="pb-1">
           <FiltroTable
             filtros={["TODOS", "TIPO", "MARCA"]}
             busca={busca}
@@ -79,16 +58,6 @@ export default function Cateteres() {
             setStatusFiltro={setStatusFiltro}
             listar={listar}
           />
-          <div>
-            <Button
-              onClick={() => {
-                setAcaoModal("criar");
-                setIsModal(true);
-              }}
-            >
-              Adicionar
-            </Button>
-          </div>
         </section>
 
         <DataTable

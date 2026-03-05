@@ -1,20 +1,19 @@
 import { DataTable } from "@/components/DataTable";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { consultarMedicos } from "@/service/api";
 import type { Medico } from "@/types/medico";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown, MoreHorizontal } from "lucide-react";
-import { useDebounce } from "@/utils/utils";
+import { MoreHorizontal } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import FiltroTable from "@/components/filtro-table";
+import ModalNefrologista from "@/components/Modals/nefrologista";
 
 type StatusFiltro = "TODOS" | "NOME";
 
@@ -24,6 +23,7 @@ export default function Nefrologistas() {
   const [acaoModal, setAcaoModal] = useState<"criar" | "editar">("criar");
   const [statusFiltro, setStatusFiltro] = useState<StatusFiltro>("TODOS");
   const [busca, setBusca] = useState("");
+  const [itemID, setItemID] = useState(0);
 
   const columns: ColumnDef<Medico>[] = [
     {
@@ -45,7 +45,15 @@ export default function Nefrologistas() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>Editar</DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setAcaoModal("editar");
+                  setItemID(row.original.id);
+                  setIsModal(true);
+                }}
+              >
+                Editar
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -55,7 +63,11 @@ export default function Nefrologistas() {
 
   async function listar(busca: string = "", statusFiltro: string = "") {
     try {
-      const response = await consultarMedicos(1, busca?.toUpperCase(), statusFiltro);
+      const response = await consultarMedicos(
+        1,
+        busca?.toUpperCase(),
+        statusFiltro
+      );
       setData(response);
     } catch (error) {
       toast.error(error?.message);
@@ -64,6 +76,13 @@ export default function Nefrologistas() {
 
   return (
     <>
+      <ModalNefrologista
+        acao={acaoModal}
+        isOpen={isModal}
+        setIsOpen={setIsModal}
+        reload={listar}
+        id={itemID}
+      />
       <main>
         <section className="flex justify-between pb-1">
           <FiltroTable

@@ -6,8 +6,14 @@ import type { Lesao } from "@/types/lesao";
 import { Button } from "@/components/ui/button";
 import FiltroTable from "@/components/filtro-table";
 import type { ColumnDef } from "@tanstack/react-table";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
+import ModalLesao from "@/components/Modals/lesao";
 
 type StatusFiltro = "TODOS" | "NOME";
 
@@ -17,6 +23,7 @@ export default function Lesoes() {
   const [acaoModal, setAcaoModal] = useState<"criar" | "editar">("criar");
   const [isModal, setIsModal] = useState(false);
   const [statusFiltro, setStatusFiltro] = useState<StatusFiltro>("TODOS");
+  const [itemID, setItemID] = useState(0);
 
   const columns: ColumnDef<Lesao>[] = [
     {
@@ -38,7 +45,15 @@ export default function Lesoes() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>Editar</DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setAcaoModal("editar");
+                  setItemID(row.original.id);
+                  setIsModal(true);
+                }}
+              >
+                Editar
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -46,7 +61,7 @@ export default function Lesoes() {
     },
   ];
 
-  async function listar(busca: string, statusFiltro: string) {
+  async function listar(busca: string = "", statusFiltro: string = "") {
     try {
       const response = await consultarLesoes(
         busca?.toUpperCase(),
@@ -60,6 +75,13 @@ export default function Lesoes() {
 
   return (
     <>
+      <ModalLesao
+        acao={acaoModal}
+        isOpen={isModal}
+        setIsOpen={setIsModal}
+        reload={listar}
+        id={itemID}
+      />
       <main>
         <section className="flex justify-between pb-1">
           <FiltroTable

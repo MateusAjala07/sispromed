@@ -101,19 +101,19 @@ export default function ModalPaciente({
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
     try {
+      let response: object;
       if (acao === "criar") {
-        await criarPaciente(data);
+        response = await criarPaciente(data);
       } else if (acao === "editar") {
-        await editarPaciente(id, data);
+        response = await editarPaciente(id, data);
       }
 
       await reload();
       setIsOpen(false);
+      toast.success(response.message);
     } catch (error) {
       if (error instanceof AxiosError) {
-        toast.error(
-          error.response?.data?.message ?? "Erro ao cadastrar paciente"
-        );
+        toast.error(error.response?.data?.message ?? "Erro ao salvar paciente");
       }
     }
   }

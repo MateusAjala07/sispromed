@@ -153,8 +153,7 @@ export default function ModalAcompanhamento({
           tipo_acesso_id: res.tipo_acesso?.id ?? null,
           cateter_id: res.cateter?.id ?? null,
           lesoes: res.lesoes?.map((l: OpcaoSelect) => l.id) ?? [],
-          tratamentos:
-            res.tratamentos?.map((t: OpcaoSelect) => t.id) ?? [],
+          tratamentos: res.tratamentos?.map((t: OpcaoSelect) => t.id) ?? [],
         });
       } catch (error) {
         console.error("Erro ao carregar acompanhamento:", error);
@@ -330,7 +329,7 @@ export default function ModalAcompanhamento({
                   placeholder="Buscar médico..."
                   value={field.value}
                   onChange={field.onChange}
-                  fetchFn={(v) => consultarMedicos(1, v)}
+                  fetchFn={(v) => consultarMedicos(1, v, "NOME")}
                   initialData={initialRecord?.medico}
                 />
                 <FieldError errors={[fieldState.error]} />

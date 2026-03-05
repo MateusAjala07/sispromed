@@ -11,6 +11,10 @@ import type { Tratamento } from "@/types/tratamento";
 import type { Cateter } from "@/types/cateter";
 import type { Acompanhamento } from "@/types/acompanhamento";
 import type { FormFieldsPaciente } from "@/components/Modals/paciente";
+import type { FormFieldsConvenio } from "@/components/Modals/convenio";
+import type { FormFieldsClinica } from "@/components/Modals/clinica";
+import type { FormFieldsTipoAcesso } from "@/components/Modals/tipo-acesso";
+import type { FormFieldsLesao } from "@/components/Modals/lesao";
 
 export const api = axios.create({
   baseURL: "http://localhost:8086",
@@ -180,6 +184,25 @@ export const consultarClinicas = async (
   });
   return data;
 };
+export const consultarClinica = async (id: number): Promise<Clinica> => {
+  const { data } = await api.get(`/clinicas/${id}`);
+  return data;
+};
+
+export const criarClinica = async (
+  body: FormFieldsClinica
+): Promise<object> => {
+  const { data } = await api.post("/clinicas", body);
+  return data;
+};
+
+export const editarClinica = async (
+  id: number,
+  body: FormFieldsClinica
+): Promise<object> => {
+  const { data } = await api.put(`/clinicas/${id}`, body);
+  return data;
+};
 
 export const consultarConvenios = async (
   q = "",
@@ -188,6 +211,26 @@ export const consultarConvenios = async (
   const { data } = await api.get(`/convenios`, {
     params: { q, category },
   });
+  return data;
+};
+
+export const consultarConvenio = async (id: number): Promise<Convenio> => {
+  const { data } = await api.get(`/convenios/${id}`);
+  return data;
+};
+
+export const criarConvenio = async (
+  body: FormFieldsConvenio
+): Promise<object> => {
+  const { data } = await api.post("/convenios", body);
+  return data;
+};
+
+export const editarConvenio = async (
+  id: number,
+  body: FormFieldsConvenio
+): Promise<object> => {
+  const { data } = await api.put(`/convenios/${id}`, body);
   return data;
 };
 
@@ -202,6 +245,24 @@ export const consultarMedicos = async (
   return data;
 };
 
+export const consultarMedico = async (id: number): Promise<Medico> => {
+  const { data } = await api.get(`/medicos/${id}`);
+  return data;
+};
+
+export const criarMedico = async (body: object): Promise<object> => {
+  const { data } = await api.post("/medicos", body);
+  return data;
+};
+
+export const editarMedico = async (
+  id: number,
+  body: object
+): Promise<object> => {
+  const { data } = await api.put(`/medicos/${id}`, body);
+  return data;
+};
+
 export const consultarTiposAcessos = async (
   q = "",
   category = ""
@@ -212,6 +273,26 @@ export const consultarTiposAcessos = async (
   return data;
 };
 
+export const consultarTipoAcesso = async (id: number): Promise<TipoAcesso> => {
+  const { data } = await api.get(`/tipos-acessos/${id}`);
+  return data;
+};
+
+export const criarTipoAcesso = async (
+  body: FormFieldsTipoAcesso
+): Promise<object> => {
+  const { data } = await api.post("/tipos-acessos", body);
+  return data;
+};
+
+export const editarTipoAcesso = async (
+  id: number,
+  body: FormFieldsTipoAcesso
+): Promise<object> => {
+  const { data } = await api.put(`/tipos-acessos/${id}`, body);
+  return data;
+};
+
 export const consultarLesoes = async (
   q = "",
   category = ""
@@ -219,6 +300,26 @@ export const consultarLesoes = async (
   const { data } = await api.get(`/lesoes`, {
     params: { q, category },
   });
+  return data;
+};
+
+export const consultarLesao = async (id: number): Promise<Lesao> => {
+  const { data } = await api.get(`/lesoes/${id}`);
+  return data;
+};
+
+export const criarLesao = async (
+  body: FormFieldsLesao
+): Promise<object> => {
+  const { data } = await api.post("/lesoes", body);
+  return data;
+};
+
+export const editarLesao= async (
+  id: number,
+  body: FormFieldsLesao
+): Promise<object> => {
+  const { data } = await api.put(`/lesoes/${id}`, body);
   return data;
 };
 

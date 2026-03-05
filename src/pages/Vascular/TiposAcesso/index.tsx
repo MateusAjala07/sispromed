@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import FiltroTable from "@/components/filtro-table";
+import ModalTipoAcesso from "@/components/Modals/tipo-acesso";
 
 type StatusFiltro = "TODOS" | "NOME";
 
@@ -23,6 +24,7 @@ export default function TiposAcesso() {
   const [acaoModal, setAcaoModal] = useState<"criar" | "editar">("criar");
   const [isModal, setIsModal] = useState(false);
   const [statusFiltro, setStatusFiltro] = useState<StatusFiltro>("TODOS");
+  const [itemID, setItemID] = useState(0);
 
   const columns: ColumnDef<TipoAcesso>[] = [
     {
@@ -44,7 +46,15 @@ export default function TiposAcesso() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>Editar</DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setAcaoModal("editar");
+                  setItemID(row.original.id);
+                  setIsModal(true);
+                }}
+              >
+                Editar
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -66,6 +76,13 @@ export default function TiposAcesso() {
 
   return (
     <>
+      <ModalTipoAcesso
+        acao={acaoModal}
+        isOpen={isModal}
+        setIsOpen={setIsModal}
+        reload={listar}
+        id={itemID}
+      />
       <main>
         <section className="flex justify-between pb-1">
           <FiltroTable
