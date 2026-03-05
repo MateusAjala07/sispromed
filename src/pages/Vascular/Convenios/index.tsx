@@ -1,37 +1,98 @@
 import { DataTable } from "@/components/DataTable";
 import type { Convenio } from "@/types/convenio";
-import { useEffect, useState } from "react";
-import { columns } from "./columns";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { consultarConvenios } from "@/service/api";
+import type { ColumnDef } from "@tanstack/react-table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { MoreHorizontal } from "lucide-react";
+import FiltroTable from "@/components/filtro-table";
+
+type StatusFiltro = "TODOS" | "NOME";
 
 export default function Convenios() {
   const [data, setData] = useState<Convenio[]>([]);
+  const [busca, setBusca] = useState("");
+  const [acaoModal, setAcaoModal] = useState<"criar" | "editar">("criar");
+  const [isModal, setIsModal] = useState(false);
+  const [statusFiltro, setStatusFiltro] = useState<StatusFiltro>("TODOS");
 
-  async function listarConvenios() {
+  const columns: ColumnDef<Convenio>[] = [
+    {
+      accessorKey: "nome",
+      header: "Nome",
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => {
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="h-8 w-8 p-0 flex justify-self-end"
+              >
+                <span className="sr-only">Abrir menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>Editar</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+    },
+  ];
+
+  async function listar(busca: string = "", statusFiltro: string = "") {
     try {
-      const response = await consultarConvenios();
+      const response = await consultarConvenios(
+        busca?.toUpperCase(),
+        statusFiltro
+      );
       setData(response);
     } catch (error) {
       toast.error(error?.message);
     }
   }
 
-  useEffect(() => {
-    listarConvenios();
-  }, []);
-
   return (
     <>
-      <section className="flex flex-1">
-        <div className="container mx-auto w-screen">
-          <DataTable
-            data={data}
-            columns={columns}
-            emptyMessage={"Nenhum convênio encontrado."}
+      <main>
+        <section className="flex justify-between pb-1">
+          <FiltroTable
+            filtros={["TODOS", "NOME"]}
+            busca={busca}
+            setBusca={setBusca}
+            statusFiltro={statusFiltro}
+            setStatusFiltro={setStatusFiltro}
+            listar={listar}
           />
-        </div>
-      </section>
+          <div>
+            <Button
+              onClick={() => {
+                setAcaoModal("criar");
+                setIsModal(true);
+              }}
+            >
+              Adicionar
+            </Button>
+          </div>
+        </section>
+
+        <DataTable
+          columns={columns}
+          data={data}
+          emptyMessage={"Nenhum convênio encontrado."}
+        />
+      </main>
     </>
   );
 }

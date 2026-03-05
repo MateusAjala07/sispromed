@@ -105,12 +105,12 @@ export const efetuarLogout = async () => {
 };
 
 export const consultarAcompanhamentos = async (
-  filtro = "",
-  busca = ""
+  q = "",
+  category = ""
 ): Promise<object> => {
-  const { data } = await api.get(
-    `/acompanhamentos?&q=${busca}&filterBy=${filtro}`
-  );
+  const { data } = await api.get(`/acompanhamentos`, {
+    params: { q, category },
+  });
   return data;
 };
 
@@ -157,10 +157,11 @@ export const editarPaciente = async (
 };
 
 export const consultarPacientes = async (
-  search: string = ""
+  q = "",
+  category = ""
 ): Promise<Paciente[]> => {
-  const { data } = await api.get("/pacientes", {
-    params: { search },
+  const { data } = await api.get(`/pacientes`, {
+    params: { q, category },
   });
   return data;
 };
@@ -171,65 +172,72 @@ export const consultarPaciente = async (id: number): Promise<Paciente> => {
 };
 
 export const consultarClinicas = async (
-  search: string = ""
+  q = "",
+  category = ""
 ): Promise<Clinica[]> => {
-  const { data } = await api.get("/clinicas", {
-    params: { search },
+  const { data } = await api.get(`/clinicas`, {
+    params: { q, category },
   });
   return data;
 };
 
 export const consultarConvenios = async (
-  search: string = ""
+  q = "",
+  category = ""
 ): Promise<Convenio[]> => {
-  const { data } = await api.get("/convenios", {
-    params: { search },
+  const { data } = await api.get(`/convenios`, {
+    params: { q, category },
   });
   return data;
 };
 
 export const consultarMedicos = async (
   especialidade: number,
-  search: string = ""
+  q: string,
+  category: string
 ): Promise<Medico[]> => {
   const { data } = await api.get("/medicos", {
-    params: { especialidade, search },
+    params: { especialidade, q, category },
   });
   return data;
 };
 
 export const consultarTiposAcessos = async (
-  search: string = ""
+  q = "",
+  category = ""
 ): Promise<TipoAcesso[]> => {
   const { data } = await api.get("/tipos-acessos", {
-    params: { search },
+    params: { q, category },
   });
   return data;
 };
 
 export const consultarLesoes = async (
-  search: string = ""
+  q = "",
+  category = ""
 ): Promise<Lesao[]> => {
-  const { data } = await api.get("/lesoes", {
-    params: { search },
+  const { data } = await api.get(`/lesoes`, {
+    params: { q, category },
   });
   return data;
 };
 
 export const consultarTratamentos = async (
-  search: string = ""
+  q = "",
+  category = ""
 ): Promise<Tratamento[]> => {
-  const { data } = await api.get("/tratamentos", {
-    params: { search },
+  const { data } = await api.get(`/tratamentos`, {
+    params: { q, category },
   });
   return data;
 };
 
 export const consultarCateteres = async (
-  search: string = ""
+  q = "",
+  category = ""
 ): Promise<Cateter[]> => {
-  const { data } = await api.get("/cateteres", {
-    params: { search },
+  const { data } = await api.get(`/cateteres`, {
+    params: { q, category },
   });
   return data;
 };

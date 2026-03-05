@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { consultarAcompanhamentos, excluirAcompanhamento } from "@/service/api";
 import { DataTable } from "@/components/DataTable";
 import { Button } from "@/components/ui/button";
@@ -10,14 +10,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown, MoreHorizontal } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import Alerta from "@/components/alerta";
 import { toast } from "sonner";
 import type { Acompanhamento } from "@/types/acompanhamento";
-import Cabecalho from "@/components/cabecalho";
-import { Input } from "@/components/ui/input";
-import { useDebounce } from "@/utils/utils";
+import { AxiosError } from "axios";
+import FiltroTable from "@/components/filtro-table";
 
 type StatusFiltro =
   | "TODOS"
@@ -29,7 +28,6 @@ type StatusFiltro =
 export default function Acompanhamentos() {
   const [data, setData] = useState<Acompanhamento[]>([]);
   const [busca, setBusca] = useState("");
-  const debouncedBusca = useDebounce(busca, 500);
   const [isModal, setIsModal] = useState(false);
   const [isModalExcluir, setIsModalExcluir] = useState(false);
   const [acaoModal, setAcaoModal] = useState<"criar" | "editar" | undefined>();
@@ -104,9 +102,17 @@ export default function Acompanhamentos() {
     },
   ];
 
-  async function listar() {
-    const response = await consultarAcompanhamentos(statusFiltro, busca);
-    setData(response);
+  async function listar(busca: string = "", statusFiltro: string = "") {
+    try {
+      const response = await consultarAcompanhamentos(busca?.toUpperCase(), statusFiltro);
+      setData(response);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        toast.error(
+          error.response?.data?.message ?? "Erro ao consultar paciente"
+        );
+      }
+    }
   }
 
   async function excluir(id: number) {
@@ -119,15 +125,8 @@ export default function Acompanhamentos() {
     }
   }
 
-  useEffect(() => {
-    if (busca && statusFiltro !== "TODOS" || !busca && statusFiltro === "TODOS") {
-      listar();
-    }
-  }, [debouncedBusca, statusFiltro]);
-
   return (
     <>
-      <Cabecalho />
       <ModalAcompanhamento
         isOpen={isModal}
         setIsOpen={setIsModal}
@@ -145,61 +144,39 @@ export default function Acompanhamentos() {
         continuar="EXCLUIR"
         onConfirm={() => excluir(itemID)}
       />
-      <main className="flex">
-        <section className="flex-1 px-4">
-          <div className="flex pt-3 pb-2 justify-between">
-            <div className="flex gap-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline">
-                    {statusFiltro === "TODOS" ? "Filtrar por" : statusFiltro}
-                    <ChevronDown className="ml-2 h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  {(
-                    [
-                      "TODOS",
-                      "PACIENTE",
-                      "CONVENIO",
-                      "CLINICA",
-                      "NEFROLOGISTA",
-                    ] as StatusFiltro[]
-                  ).map((status) => (
-                    <DropdownMenuItem
-                      key={status}
-                      onClick={() => setStatusFiltro(status)}
-                    >
-                      {status === "TODOS" ? "Todos os campos" : status}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <Input
-                placeholder="Buscar..."
-                className="w-100"
-                value={busca}
-                onChange={(e) => setBusca(e.target.value)}
-              />
-            </div>
-            <div>
-              <Button
-                onClick={() => {
-                  setAcaoModal("criar");
-                  setIsModal(true);
-                }}
-              >
-                Adicionar
-              </Button>
-            </div>
-          </div>
 
-          <DataTable
-            columns={columns}
-            data={data}
-            emptyMessage={"Nenhum acompanhamento encontrado."}
+      <main>
+        <section className="flex justify-between pb-1">
+          <FiltroTable
+            filtros={[
+              "TODOS",
+              "PACIENTE",
+              "CONVENIO",
+              "CLINICA",
+              "NEFROLOGISTA",
+            ]}
+            busca={busca}
+            setBusca={setBusca}
+            statusFiltro={statusFiltro}
+            setStatusFiltro={setStatusFiltro}
+            listar={listar}
           />
+          <div>
+            <Button
+              onClick={() => {
+                setAcaoModal("criar");
+                setIsModal(true);
+              }}
+            >
+              Adicionar
+            </Button>
+          </div>
         </section>
+        <DataTable
+          columns={columns}
+          data={data}
+          emptyMessage={"Nenhum acompanhamento encontrado."}
+        />
       </main>
     </>
   );
