@@ -1,4 +1,4 @@
-import { DataTable } from "@/components/DataTable";
+import { DataTable } from "@/components/data-table";
 import { useState } from "react";
 import { toast } from "sonner";
 import { consultarClinicas } from "@/service/api";
@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Plus } from "lucide-react";
 import FiltroTable from "@/components/filtro-table";
 import ModalClinica from "@/components/Modals/clinica";
 
@@ -23,7 +23,8 @@ export default function Clinicas() {
   const [acaoModal, setAcaoModal] = useState<"criar" | "editar">("criar");
   const [isModal, setIsModal] = useState(false);
   const [itemID, setItemID] = useState(0);
-  const [statusFiltro, setStatusFiltro] = useState<StatusFiltro>("Todos");
+  const [statusFiltro, setStatusFiltro] = useState<StatusFiltro>("Nome");
+  const [isLoading, setIsLoading] = useState(false);
 
   const columns: ColumnDef<Clinica>[] = [
     {
@@ -63,6 +64,7 @@ export default function Clinicas() {
 
   async function listar(busca: string = "", statusFiltro: string = "") {
     try {
+      setIsLoading(true);
       const response = await consultarClinicas(
         busca?.toUpperCase(),
         statusFiltro?.toUpperCase()
@@ -70,6 +72,8 @@ export default function Clinicas() {
       setData(response);
     } catch (error) {
       toast.error(error?.message);
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -100,12 +104,14 @@ export default function Clinicas() {
                 setIsModal(true);
               }}
             >
-              Adicionar
+              <Plus />
+              Criar nova clínica
             </Button>
           </div>
         </section>
 
         <DataTable
+          loading={isLoading}
           columns={columns}
           data={data}
           emptyMessage={"Nenhuma clínica encontrada."}

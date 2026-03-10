@@ -1,4 +1,4 @@
-import { DataTable } from "@/components/DataTable";
+import { DataTable } from "@/components/data-table";
 import { useState } from "react";
 import { toast } from "sonner";
 import { consultarPacientes } from "@/service/api";
@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Plus } from "lucide-react";
 import { formatarCPF, formatarTelefone } from "@/utils/format";
 import { AxiosError } from "axios";
 import FiltroTable from "@/components/filtro-table";
@@ -25,7 +25,8 @@ export default function Pacientes() {
   const [acaoModal, setAcaoModal] = useState<"criar" | "editar">("criar");
   const [itemID, setItemID] = useState(0);
   const [busca, setBusca] = useState("");
-  const [statusFiltro, setStatusFiltro] = useState<StatusFiltro>("Todos");
+  const [statusFiltro, setStatusFiltro] = useState<StatusFiltro>("Nome");
+  const [isLoading, setIsLoading] = useState(false);
 
   const columns: ColumnDef<Paciente>[] = [
     {
@@ -72,19 +73,16 @@ export default function Pacientes() {
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="h-8 w-8 p-0 flex justify-self-end"
-              >
-                <span className="sr-only">Abrir menu</span>
+              <Button variant="ghost" className="h-8 w-8 p-0">
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
+
             <DropdownMenuContent align="end">
               <DropdownMenuItem
                 onClick={() => {
-                  setAcaoModal("editar");
                   setItemID(row.original.id);
+                  setAcaoModal("editar");
                   setIsModal(true);
                 }}
               >
@@ -139,12 +137,14 @@ export default function Pacientes() {
                 setIsModal(true);
               }}
             >
-              Adicionar
+              <Plus />
+              Criar novo paciente
             </Button>
           </div>
         </section>
 
         <DataTable
+          loading={isLoading}
           columns={columns}
           data={data}
           emptyMessage={"Nenhum paciente encontrado."}

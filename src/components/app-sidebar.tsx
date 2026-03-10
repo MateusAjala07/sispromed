@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, replace, useLocation, useNavigate } from "react-router";
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router";
 import {
   Activity,
   Bandage,
@@ -31,6 +31,12 @@ import {
 } from "@/components/ui/sidebar";
 
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -39,6 +45,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import useGlobalState from "@/state/useGlobalState";
+
+import logo from "@/assets/images/logo-icone.png";
 
 type SidebarItem = {
   title: string;
@@ -103,57 +111,84 @@ const sidebarItems: SidebarItem[] = [
 
 function SidebarSubmenu({ item }: { item: SidebarItem }) {
   const { pathname } = useLocation();
-  const [open, setOpen] = useState(false);
+  const { open, setOpen } = useSidebar();
+
+  const hasActiveChild = item.children?.some((child) =>
+    pathname.startsWith(child.url!)
+  );
+
+  const [submenuOpen, setSubmenuOpen] = useState(hasActiveChild);
+
+  useEffect(() => {
+    if (!open) {
+      setSubmenuOpen(false);
+    }
+  }, [open]);
+
+  function handleTrigger() {
+    if (!open) {
+      setOpen(true);
+      return;
+    }
+
+    setSubmenuOpen(!submenuOpen);
+  }
 
   return (
-    <SidebarMenuItem>
-      <SidebarMenuButton
-        onClick={() => setOpen(!open)}
-        className="justify-between"
-        tooltip={item.title}
-      >
-        <div className="flex items-center">
-          <item.icon className="mr-2 h-4 w-4" />
-          {item.title}
-        </div>
+    <Collapsible open={submenuOpen} onOpenChange={setSubmenuOpen}>
+      <SidebarMenuItem>
+        <CollapsibleTrigger asChild>
+          <SidebarMenuButton
+            onClick={handleTrigger}
+            className="justify-between"
+            tooltip={item.title}
+          >
+            <div className="flex items-center">
+              <item.icon className="mr-4 h-4 w-4" />
+              {item.title}
+            </div>
 
-        <ChevronDown
-          className={`transition-transform ${open ? "rotate-180" : ""}`}
-          size={16}
-        />
-      </SidebarMenuButton>
+            <ChevronDown
+              className={`transition-transform ${
+                submenuOpen ? "rotate-180" : ""
+              }`}
+              size={16}
+            />
+          </SidebarMenuButton>
+        </CollapsibleTrigger>
 
-      {open && (
-        <div className="ml-6 mt-1 space-y-1">
-          {item.children?.map((sub) => {
-            const active = pathname.startsWith(sub.url!);
+        <CollapsibleContent>
+          <div className="ml-6 mt-1 space-y-1">
+            {item.children?.map((sub) => {
+              const active = pathname.startsWith(sub.url!);
 
-            return (
-              <Link
-                key={sub.title}
-                to={sub.url!}
-                className={`
-                  block rounded-md px-2 py-1 text-sm transition-colors
-                  ${
-                    active
-                      ? "bg-primary/10 text-primary font-medium"
-                      : "hover:bg-muted"
-                  }
-                `}
-              >
-                {sub.title}
-              </Link>
-            );
-          })}
-        </div>
-      )}
-    </SidebarMenuItem>
+              return (
+                <Link
+                  key={sub.title}
+                  to={sub.url!}
+                  className={`
+                    block rounded-md px-2 py-1 text-sm transition-colors
+                    ${
+                      active
+                        ? "bg-primary/10 text-primary font-medium"
+                        : "hover:bg-muted"
+                    }
+                  `}
+                >
+                  {sub.title}
+                </Link>
+              );
+            })}
+          </div>
+        </CollapsibleContent>
+      </SidebarMenuItem>
+    </Collapsible>
   );
 }
 
 export function AppSidebar() {
   const { pathname } = useLocation();
-  const { isMobile } = useSidebar();
+  const { isMobile, open } = useSidebar();
   const nomeUsuario = useGlobalState((state) => state.nome_usuario);
 
   return (
@@ -162,7 +197,11 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <span className="text-base font-semibold">SISPROMED</span>
+              {open ? (
+                <span className="font-semibold">SISPROMED</span>
+              ) : (
+                <img src={logo} />
+              )}
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -215,10 +254,7 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <SidebarMenuButton
-                  size="lg"
-                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                >
+                <SidebarMenuButton className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
                   <User />
 
                   <div className="grid flex-1 text-left text-sm leading-tight">

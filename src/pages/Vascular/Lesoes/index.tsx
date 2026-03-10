@@ -1,4 +1,4 @@
-import { DataTable } from "@/components/DataTable";
+import { DataTable } from "@/components/data-table";
 import { useState } from "react";
 import { toast } from "sonner";
 import { consultarLesoes } from "@/service/api";
@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Plus } from "lucide-react";
 import ModalLesao from "@/components/Modals/lesao";
 
 type StatusFiltro = "Todos" | "Nome";
@@ -22,8 +22,9 @@ export default function Lesoes() {
   const [busca, setBusca] = useState("");
   const [acaoModal, setAcaoModal] = useState<"criar" | "editar">("criar");
   const [isModal, setIsModal] = useState(false);
-  const [statusFiltro, setStatusFiltro] = useState<StatusFiltro>("Todos");
+  const [statusFiltro, setStatusFiltro] = useState<StatusFiltro>("Nome");
   const [itemID, setItemID] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
   const columns: ColumnDef<Lesao>[] = [
     {
@@ -63,6 +64,7 @@ export default function Lesoes() {
 
   async function listar(busca: string = "", statusFiltro: string = "") {
     try {
+      setIsLoading(true);
       const response = await consultarLesoes(
         busca?.toUpperCase(),
         statusFiltro?.toUpperCase()
@@ -70,6 +72,8 @@ export default function Lesoes() {
       setData(response);
     } catch (error) {
       toast.error(error?.message);
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -99,12 +103,14 @@ export default function Lesoes() {
                 setIsModal(true);
               }}
             >
-              Adicionar
+              <Plus />
+              Criar nova lesão
             </Button>
           </div>
         </section>
 
         <DataTable
+          loading={isLoading}
           columns={columns}
           data={data}
           emptyMessage={"Nenhuma lesão encontrada."}

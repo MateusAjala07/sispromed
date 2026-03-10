@@ -12,5 +12,7 @@ export type Acompanhamento = {
   alteracao_clinica: string;
   lesoes: string;
   tratamentos: string;
-  observacoes: string;
+  observacao: string;
+  qtd_lesoes_acompanhamento: number;
+  qtd_tratamentos_acompanhamento: number;
 };

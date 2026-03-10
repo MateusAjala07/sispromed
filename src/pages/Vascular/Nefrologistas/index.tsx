@@ -1,4 +1,4 @@
-import { DataTable } from "@/components/DataTable";
+import { DataTable } from "@/components/data-table";
 import { useState } from "react";
 import { toast } from "sonner";
 import { consultarMedicos } from "@/service/api";
@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Plus } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import FiltroTable from "@/components/filtro-table";
 import ModalNefrologista from "@/components/Modals/nefrologista";
@@ -21,9 +21,10 @@ export default function Nefrologistas() {
   const [data, setData] = useState<Medico[]>([]);
   const [isModal, setIsModal] = useState(false);
   const [acaoModal, setAcaoModal] = useState<"criar" | "editar">("criar");
-  const [statusFiltro, setStatusFiltro] = useState<StatusFiltro>("Todos");
+  const [statusFiltro, setStatusFiltro] = useState<StatusFiltro>("Nome");
   const [busca, setBusca] = useState("");
   const [itemID, setItemID] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
   const columns: ColumnDef<Medico>[] = [
     {
@@ -63,6 +64,7 @@ export default function Nefrologistas() {
 
   async function listar(busca: string = "", statusFiltro: string = "") {
     try {
+      setIsLoading(true);
       const response = await consultarMedicos(
         1,
         busca?.toUpperCase(),
@@ -71,6 +73,8 @@ export default function Nefrologistas() {
       setData(response);
     } catch (error) {
       toast.error(error?.message);
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -100,12 +104,14 @@ export default function Nefrologistas() {
                 setIsModal(true);
               }}
             >
-              Adicionar
+              <Plus />
+              Criar novo nefrologista
             </Button>
           </div>
         </section>
 
         <DataTable
+          loading={isLoading}
           columns={columns}
           data={data}
           emptyMessage={"Nenhum nefrologista encontrado."}

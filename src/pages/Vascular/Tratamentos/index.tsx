@@ -1,4 +1,4 @@
-import { DataTable } from "@/components/DataTable";
+import { DataTable } from "@/components/data-table";
 import { useState } from "react";
 import { toast } from "sonner";
 import { consultarTratamentos } from "@/service/api";
@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Plus } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import FiltroTable from "@/components/filtro-table";
 import ModalTratamento from "@/components/Modals/tratamento";
@@ -22,8 +22,9 @@ export default function Tratamentos() {
   const [busca, setBusca] = useState("");
   const [acaoModal, setAcaoModal] = useState<"criar" | "editar">("criar");
   const [isModal, setIsModal] = useState(false);
-  const [statusFiltro, setStatusFiltro] = useState<StatusFiltro>("Todos");
+  const [statusFiltro, setStatusFiltro] = useState<StatusFiltro>("Nome");
   const [itemID, setItemID] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
   const columns: ColumnDef<Tratamento>[] = [
     {
@@ -63,6 +64,7 @@ export default function Tratamentos() {
 
   async function listar(busca: string = "", statusFiltro: string = "") {
     try {
+      setIsLoading(true);
       const response = await consultarTratamentos(
         busca?.toUpperCase(),
         statusFiltro?.toUpperCase()
@@ -70,6 +72,8 @@ export default function Tratamentos() {
       setData(response);
     } catch (error) {
       toast.error(error?.message);
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -99,12 +103,14 @@ export default function Tratamentos() {
                 setIsModal(true);
               }}
             >
-              Adicionar
+              <Plus />
+              Criar novo tratamento
             </Button>
           </div>
         </section>
 
         <DataTable
+          loading={isLoading}
           columns={columns}
           data={data}
           emptyMessage={"Nenhum tratamento encontrado."}

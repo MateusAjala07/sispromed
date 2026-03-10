@@ -17,6 +17,8 @@ import type { FormFieldsTipoAcesso } from "@/components/Modals/tipo-acesso";
 import type { FormFieldsLesao } from "@/components/Modals/lesao";
 import type { FormFieldsTratamento } from "@/components/Modals/tratamento";
 import type { DashboardVascular } from "@/types/dashboardVascular";
+import type { FormFieldsLesaoAcompanhamento } from "@/components/Modals/lesao-acompanhamento";
+import type { FormFieldsTratamentoAcompanhamento } from "@/components/Modals/tratamento-acompanhamento";
 
 export const api = axios.create({
   baseURL: "http://localhost:8086",
@@ -159,7 +161,7 @@ export const criarPaciente = async (
 };
 
 export const editarPaciente = async (
-  id,
+  id: number,
   body: FormFieldsPaciente
 ): Promise<object> => {
   const { data } = await api.put(`/pacientes/${id}`, body);
@@ -314,8 +316,30 @@ export const consultarLesao = async (id: number): Promise<Lesao> => {
   return data;
 };
 
+export const consultarLesoesAcompanhamento = async (
+  id: number
+): Promise<any> => {
+  const { data } = await api.get(`/lesoes/acompanhamento/${id}`);
+  return data;
+};
+
+export const consultarLesaoAcompanhamento = async (
+  id: number
+): Promise<object> => {
+  const { data } = await api.get(`/lesao/acompanhamento/${id}`);
+  return data;
+};
+
 export const criarLesao = async (body: FormFieldsLesao): Promise<object> => {
   const { data } = await api.post("/lesoes", body);
+  return data;
+};
+
+export const criarLesaoAcompanhamento = async (
+  id: number,
+  body: FormFieldsLesaoAcompanhamento
+): Promise<object> => {
+  const { data } = await api.post(`/lesoes/acompanhamento/${id}`, body);
   return data;
 };
 
@@ -324,6 +348,21 @@ export const editarLesao = async (
   body: FormFieldsLesao
 ): Promise<object> => {
   const { data } = await api.put(`/lesoes/${id}`, body);
+  return data;
+};
+
+export const editarLesaoAcompanhamento = async (
+  id: number,
+  body: FormFieldsLesaoAcompanhamento
+): Promise<object> => {
+  const { data } = await api.put(`/lesoes/acompanhamento/${id}`, body);
+  return data;
+};
+
+export const excluirLesaoAcompanhamento = async (
+  id: number
+): Promise<object> => {
+  const { data } = await api.delete(`/lesoes/acompanhamento/${id}`);
   return data;
 };
 
@@ -337,8 +376,22 @@ export const consultarTratamentos = async (
   return data;
 };
 
+export const consultarTratamentosAcompanhamento = async (
+  id: number
+): Promise<Array<object>> => {
+  const { data } = await api.get(`/tratamentos/acompanhamento/${id}`);
+  return data;
+};
+
 export const consultarTratamento = async (id: number): Promise<Tratamento> => {
   const { data } = await api.get(`/tratamentos/${id}`);
+  return data;
+};
+
+export const consultarTratamentoAcompanhamento = async (
+  id: number
+): Promise<object> => {
+  const { data } = await api.get(`/tratamento/acompanhamento/${id}`);
   return data;
 };
 
@@ -349,11 +402,34 @@ export const criarTratamento = async (
   return data;
 };
 
+export const criarTratamentoAcompanhamento = async (
+  id: number,
+  body: FormFieldsTratamentoAcompanhamento
+): Promise<object> => {
+  const { data } = await api.post(`/tratamentos/acompanhamento/${id}`, body);
+  return data;
+};
+
 export const editarTratamento = async (
   id: number,
   body: FormFieldsTratamento
 ): Promise<object> => {
   const { data } = await api.put(`/tratamentos/${id}`, body);
+  return data;
+};
+
+export const editarTratamentoAcompanhamento = async (
+  id: number,
+  body: FormFieldsTratamentoAcompanhamento
+): Promise<object> => {
+  const { data } = await api.put(`/tratamentos/acompanhamento/${id}`, body);
+  return data;
+};
+
+export const excluirTratamentoAcompanhamento = async (
+  id: number
+): Promise<object> => {
+  const { data } = await api.delete(`/tratamentos/acompanhamento/${id}`);
   return data;
 };
 

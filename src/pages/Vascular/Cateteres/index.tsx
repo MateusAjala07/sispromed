@@ -1,4 +1,4 @@
-import { DataTable } from "@/components/DataTable";
+import { DataTable } from "@/components/data-table";
 import { useState } from "react";
 import { toast } from "sonner";
 import { consultarCateteres } from "@/service/api";
@@ -12,6 +12,7 @@ export default function Cateteres() {
   const [data, setData] = useState<Cateter[]>([]);
   const [busca, setBusca] = useState("");
   const [statusFiltro, setStatusFiltro] = useState<StatusFiltro>("Todos");
+  const [isLoading, setIsLoading] = useState(false);
 
   const columns: ColumnDef<Cateter>[] = [
     {
@@ -26,6 +27,7 @@ export default function Cateteres() {
 
   async function listar(busca: string = "", statusFiltro: string = "") {
     try {
+      setIsLoading(true);
       const response = await consultarCateteres(
         busca?.toUpperCase(),
         statusFiltro?.toUpperCase()
@@ -33,6 +35,8 @@ export default function Cateteres() {
       setData(response);
     } catch (error) {
       toast.error(error?.message);
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -51,6 +55,7 @@ export default function Cateteres() {
         </section>
 
         <DataTable
+          loading={isLoading}
           columns={columns}
           data={data}
           emptyMessage={"Nenhum cateter encontrado."}

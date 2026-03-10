@@ -32,8 +32,6 @@ export default function FiltroTable({
   const debouncedBusca = useDebounce(busca, 500);
 
   useEffect(() => {
-    if (statusFiltro !== "Todos" && !busca) return;
-
     listar(debouncedBusca, statusFiltro);
   }, [debouncedBusca, statusFiltro]);
 
@@ -46,7 +44,7 @@ export default function FiltroTable({
   }, [statusFiltro]);
 
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-2 w-full sm:w-auto">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline">
@@ -76,7 +74,7 @@ export default function FiltroTable({
       {statusFiltro !== "Todos" && (
         <Input
           placeholder="Buscar..."
-          className="w-100"
+          className="w-full sm:w-100"
           value={busca}
           onChange={(e) => setBusca(e.target.value.toUpperCase())}
           ref={inputRefBusca}
