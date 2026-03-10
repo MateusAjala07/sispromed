@@ -23,3 +23,12 @@ export function formatarCPF(value: string) {
     .replace(/(\d{3})(\d)/, "$1.$2")
     .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
 }
+
+export function formatarDataTimezoneParaISO(agora: Date) {
+  const ano = agora.getFullYear();
+  const mes = String(agora.getMonth() + 1).padStart(2, "0");
+  const dia = String(agora.getDate()).padStart(2, "0");
+  const dataFormatada = `${ano}-${mes}-${dia}`;
+
+  return dataFormatada;
+}

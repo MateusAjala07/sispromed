@@ -17,20 +17,27 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { Button } from "../ui/button";
+import { Button } from "./ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import React from "react";
+import SkeletonTable from "./Skeletons/table";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   emptyMessage: String;
+  loading: boolean;
+  columnsLoading?: number;
+  rowsLoading?: number;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   emptyMessage = "Nenhum resultado encontrado.",
+  loading = false,
+  columnsLoading = columns.length,
+  rowsLoading = 3,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -48,6 +55,15 @@ export function DataTable<TData, TValue>({
     },
   });
 
+  if (loading) {
+    return (
+      <SkeletonTable
+        numeroColunas={columnsLoading}
+        numeroLinhas={rowsLoading}
+      />
+    );
+  }
+
   return (
     <div className="w-full">
       <div className="overflow-hidden rounded-md border">
@@ -57,7 +73,7 @@ export function DataTable<TData, TValue>({
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className="w-2">
                       {header.isPlaceholder
                         ? null
                         : flexRender(

@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AxiosError } from "axios";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeClosed, HeartPulse, Loader2 } from "lucide-react";
+import { Eye, EyeClosed, Loader2 } from "lucide-react";
 import { GoogleLogin } from "@react-oauth/google";
 import clinica from "@/assets/images/clinica.svg";
 import { useNavigate } from "react-router";
@@ -13,7 +13,15 @@ import { useForm } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 
-import { efetuarLogin, efetuarLoginGoogle } from "@/service/api.ts";
+import useGlobalState from "@/state/useGlobalState";
+
+import logo from "@/assets/images/logo4.png";
+
+import {
+  efetuarLogin,
+  efetuarLoginGoogle,
+  efetuarLogout,
+} from "@/service/api.ts";
 
 const schema = z.object({
   email: z.email("Email inválido"),
@@ -23,6 +31,8 @@ const schema = z.object({
 type FormFields = z.infer<typeof schema>;
 
 export default function Login() {
+  const setNome = useGlobalState((state) => state.setNomeUsuario);
+
   const {
     register,
     handleSubmit,
@@ -38,8 +48,9 @@ export default function Login() {
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
     try {
       const { email, senha } = data;
-      await efetuarLogin(email, senha);
-      navigate("/vascular/acompanhamentos");
+      const response = await efetuarLogin(email, senha);
+      setNome(response);
+      navigate("/vascular/dashboard");
     } catch (error) {
       if (error instanceof AxiosError) {
         setError("root", {
@@ -49,6 +60,14 @@ export default function Login() {
     }
   };
 
+  async function logout() {
+    await efetuarLogout();
+  }
+
+  useEffect(() => {
+    logout();
+  }, []);
+
   return (
     <>
       <main className="grid md:grid-cols-2 container mx-auto h-screen">
@@ -56,15 +75,7 @@ export default function Login() {
           <img src={clinica} alt="clinica" />
         </section>
         <section className="flex flex-col justify-center items-center">
-          <HeartPulse className="w-14 h-14 bg-primary text-primary-foreground p-3 rounded-full" />
-          <div className="mt-3">
-            <h1 className="text-zinc-800 text-center tracking-tight text-3xl font-bold leading-tight">
-              Bem-vindo
-            </h1>
-            <h2 className="text-zinc-600 text-base font-normal leading-normal pt-1">
-              Insira suas credenciais para continuar.
-            </h2>
-          </div>
+          <img src={logo} alt="SISPROMED" />
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col gap-4 w-full max-w-lg p-4"
@@ -128,7 +139,7 @@ export default function Login() {
               <GoogleLogin
                 onSuccess={async (credentialResponse: any) => {
                   await efetuarLoginGoogle(credentialResponse.credential);
-                  navigate("/agenda");
+                  navigate("/vascular/dashboard");
                 }}
                 onError={() => console.error("Login failed")}
               />

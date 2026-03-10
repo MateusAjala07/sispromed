@@ -25,11 +25,9 @@ import {
   consultarCateteres,
   consultarClinicas,
   consultarConvenios,
-  consultarLesoes,
   consultarMedicos,
   consultarPacientes,
   consultarTiposAcessos,
-  consultarTratamentos,
   criarAcompanhamento,
   editarAcompanhamento,
 } from "@/service/api";
@@ -81,9 +79,7 @@ const formSchema = z.object({
   ultimo_usv: z.string().min(1, "Obrigatório"),
   lesao_50: z.boolean().default(false),
   alteracao_clinica: z.boolean().default(false),
-  lesoes: z.array(z.number()).min(1, "Selecione ao menos uma"),
-  tratamentos: z.array(z.number()).min(1, "Selecione ao menos um"),
-  observacoes: z.string().toUpperCase().optional(),
+  observacao: z.string().toUpperCase().optional(),
 });
 
 export type FormFieldsAcompanhamento = z.infer<typeof formSchema>;
@@ -95,14 +91,12 @@ const defaultValoresFormulario: FormFieldsAcompanhamento = {
   medico_id: null,
   tipo_acesso_id: null,
   cateter_id: null,
-  lesoes: [],
-  tratamentos: [],
   lesao_50: false,
   alteracao_clinica: false,
   situacao_clinica: "",
   ultimo_acesso: "",
   ultimo_usv: "",
-  observacoes: "",
+  observacao: "",
 };
 
 export default function ModalAcompanhamento({
@@ -152,9 +146,6 @@ export default function ModalAcompanhamento({
           medico_id: res.medico?.id ?? null,
           tipo_acesso_id: res.tipo_acesso?.id ?? null,
           cateter_id: res.cateter?.id ?? null,
-          lesoes: res.lesoes?.map((l: OpcaoSelect) => l.id) ?? [],
-          tratamentos:
-            res.tratamentos?.map((t: OpcaoSelect) => t.id) ?? [],
         });
       } catch (error) {
         console.error("Erro ao carregar acompanhamento:", error);
@@ -168,19 +159,11 @@ export default function ModalAcompanhamento({
 
   const onSubmit = async (values: FormFieldsAcompanhamento) => {
     try {
-      const payload = {
-        ...values,
-        lesoes: values.lesoes.map((id) => ({ id })),
-        tratamentos: values.tratamentos.map((id) => ({
-          id,
-        })),
-      };
-
       let responseData: any;
       if (acao === "criar") {
-        responseData = await criarAcompanhamento(payload);
+        responseData = await criarAcompanhamento(values);
       } else if (acao === "editar") {
-        responseData = await editarAcompanhamento(id, payload);
+        responseData = await editarAcompanhamento(id, values);
       }
 
       reload();
@@ -330,7 +313,7 @@ export default function ModalAcompanhamento({
                   placeholder="Buscar médico..."
                   value={field.value}
                   onChange={field.onChange}
-                  fetchFn={(v) => consultarMedicos(1, v)}
+                  fetchFn={(v) => consultarMedicos(1, v, "NOME")}
                   initialData={initialRecord?.medico}
                 />
                 <FieldError errors={[fieldState.error]} />
@@ -460,54 +443,11 @@ export default function ModalAcompanhamento({
           </div>
 
           <Controller
-            name="lesoes"
+            name="observacao"
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>
-                  Lesões <span className="text-destructive">*</span>
-                </FieldLabel>
-                <FormAsyncSelect
-                  isMulti
-                  placeholder="Buscar lesões..."
-                  value={field.value}
-                  onChange={field.onChange}
-                  fetchFn={consultarLesoes}
-                  initialData={initialRecord?.lesoes}
-                />
-                <FieldError errors={[fieldState.error]} />
-              </Field>
-            )}
-          />
-
-          <Controller
-            name="tratamentos"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>
-                  Tratamentos
-                  <span className="text-destructive">*</span>
-                </FieldLabel>
-                <FormAsyncSelect
-                  isMulti
-                  placeholder="Buscar tratamentos..."
-                  value={field.value}
-                  onChange={field.onChange}
-                  fetchFn={consultarTratamentos}
-                  initialData={initialRecord?.tratamentos}
-                />
-                <FieldError errors={[fieldState.error]} />
-              </Field>
-            )}
-          />
-
-          <Controller
-            name="observacoes"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>Observações</FieldLabel>
+                <FieldLabel>Observação</FieldLabel>
                 <Textarea className="uppercase" {...field} />
                 <FieldError errors={[fieldState.error]} />
               </Field>
@@ -557,7 +497,7 @@ interface FormAsyncSelectProps {
   inputId?: string;
 }
 
-function FormAsyncSelect({
+export function FormAsyncSelect({
   value,
   onChange,
   fetchFn,
