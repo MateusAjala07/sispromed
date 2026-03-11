@@ -343,7 +343,7 @@ export default function Acompanhamentos() {
 
       <main>
         <section className="flex justify-between flex-wrap gap-2 pb-1">
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <BuscarTable
               filtros={[
                 "Todos",

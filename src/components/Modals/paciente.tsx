@@ -175,6 +175,27 @@ export default function ModalPaciente({
             </DialogHeader>
 
             <Controller
+              name="nome"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>
+                    Nome <span className="text-destructive">*</span>
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    autoComplete="off"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
               name="cpf"
               control={form.control}
               render={({ field, fieldState }) => (
@@ -203,27 +224,6 @@ export default function ModalPaciente({
             />
 
             <Controller
-              name="nome"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>
-                    Nome <span className="text-destructive">*</span>
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id={field.name}
-                    aria-invalid={fieldState.invalid}
-                    autoComplete="off"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-
-            <Controller
               name="genero"
               control={form.control}
               render={({ field, fieldState }) => (
@@ -231,7 +231,11 @@ export default function ModalPaciente({
                   <FieldLegend variant="label">
                     Gênero <span className="text-destructive">*</span>
                   </FieldLegend>
-                  <RadioGroup name={field.name} value={field.value} onValueChange={field.onChange}>
+                  <RadioGroup
+                    name={field.name}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  >
                     <Field
                       orientation="horizontal"
                       data-invalid={fieldState.invalid}

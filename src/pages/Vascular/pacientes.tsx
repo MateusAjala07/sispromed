@@ -30,6 +30,32 @@ export default function Pacientes() {
 
   const columns: ColumnDef<Paciente>[] = [
     {
+      id: "actions",      
+      cell: ({ row }) => {
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={() => {
+                  setItemID(row.original.id);
+                  setAcaoModal("editar");
+                  setIsModal(true);
+                }}
+              >
+                Editar
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+    },
+    {
       accessorKey: "nome",
       header: "Nome",
     },
@@ -71,32 +97,6 @@ export default function Pacientes() {
       accessorKey: "numero",
       header: "Número",
     },
-    {
-      id: "actions",
-      cell: ({ row }) => {
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={() => {
-                  setItemID(row.original.id);
-                  setAcaoModal("editar");
-                  setIsModal(true);
-                }}
-              >
-                Editar
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
-      },
-    },
   ];
 
   async function listar(
@@ -129,7 +129,7 @@ export default function Pacientes() {
         id={itemID}
       />
       <main>
-        <section className="flex justify-between pb-1">
+        <section className="flex justify-between flex-wrap gap-2 pb-1">
           <BuscarTable
             filtros={["Todos", "Nome"]}
             busca={busca}

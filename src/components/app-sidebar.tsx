@@ -194,6 +194,7 @@ export function AppSidebar() {
   const { pathname } = useLocation();
   const { isMobile, open } = useSidebar();
   const nomeUsuario = useGlobalState((state) => state.nome_usuario);
+  const perfilUsuario = useGlobalState((state) => state.perfil_usuario)
   const [isModalPrazoDoppler, setIsModalPrazoDoppler] = useState(false);
 
   return (
@@ -285,6 +286,15 @@ export function AppSidebar() {
                   sideOffset={4}
                 >
                   <DropdownMenuLabel>Opções</DropdownMenuLabel>
+
+                  {perfilUsuario === 1 && (
+                    <Link to={"/usuarios"}>
+                      <DropdownMenuItem variant="outline">
+                        <Users />
+                        Usuários
+                      </DropdownMenuItem>
+                    </Link>
+                  )}
 
                   <DropdownMenuItem
                     variant={"outline"}

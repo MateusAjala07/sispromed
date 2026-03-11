@@ -50,10 +50,10 @@ export const router = createBrowserRouter([
         element: <Tratamentos />,
       },
 
-      // {
-      //   path: "usuarios",
-      //   element: <Usuarios />,
-      // },
+      {
+        path: "usuarios",
+        element: <Usuarios />,
+      },
     ],
   },
 ]);

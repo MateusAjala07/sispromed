@@ -1,4 +1,5 @@
 import { DataTable } from "@/components/data-table";
+import { Badge } from "@/components/ui/badge";
 import { consultarUsuarios } from "@/service/api";
 import type { AxiosError } from "axios";
 import { useEffect, useState } from "react";
@@ -23,6 +24,18 @@ export default function Usuarios() {
     {
       accessorKey: "situacao",
       header: "Situação",
+      cell: ({ row }) => {
+        const variant =
+          row.original.situacao === "Permitido" ? "success" : "destructive";
+
+        return (
+          <div>
+            <Badge variant={variant} className={`px-2 py-1 rounded-md`}>
+              {row.original.situacao}
+            </Badge>
+          </div>
+        );
+      },
     },
     {
       accessorKey: "perfil",

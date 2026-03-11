@@ -31,7 +31,9 @@ const schema = z.object({
 type FormFields = z.infer<typeof schema>;
 
 export default function Login() {
+  const resetState = useGlobalState((state) => state.resetState);
   const setNome = useGlobalState((state) => state.setNomeUsuario);
+  const setPerfil = useGlobalState((state) => state.setPerfilUsuario);
 
   const {
     register,
@@ -49,7 +51,8 @@ export default function Login() {
     try {
       const { email, senha } = data;
       const response = await efetuarLogin(email, senha);
-      setNome(response);
+      setNome(response.nome);
+      setPerfil(response.perfil);
       navigate("/vascular/dashboard");
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -61,6 +64,7 @@ export default function Login() {
   };
 
   async function logout() {
+    resetState();
     await efetuarLogout();
   }
 

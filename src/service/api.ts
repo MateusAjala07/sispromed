@@ -99,7 +99,7 @@ export const efetuarLogin = async (
   });
 
   setAccessToken(data.access_token);
-  return data.nome;
+  return data;
 };
 
 export const efetuarLoginGoogle = async (id_token: string) => {

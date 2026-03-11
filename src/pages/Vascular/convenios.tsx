@@ -93,7 +93,7 @@ export default function Convenios() {
         id={itemID}
       />
       <main>
-        <section className="flex justify-between pb-1">
+        <section className="flex justify-between flex-wrap gap-2 pb-1">
           <BuscarTable
             filtros={["Todos", "Nome"]}
             busca={busca}

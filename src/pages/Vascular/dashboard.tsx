@@ -107,7 +107,7 @@ export default function DashboardVascular() {
             >
               <PieChart>
                 <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-                <Pie
+                <Pie              
                   data={dataTotalPacienteConvenio.chartData}
                   dataKey="value"
                   nameKey="name"
