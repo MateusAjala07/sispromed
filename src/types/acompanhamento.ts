@@ -15,4 +15,5 @@ export type Acompanhamento = {
   observacao: string;
   qtd_lesoes_acompanhamento: number;
   qtd_tratamentos_acompanhamento: number;
+  idade: number;
 };

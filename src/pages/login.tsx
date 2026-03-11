@@ -75,7 +75,7 @@ export default function Login() {
           <img src={clinica} alt="clinica" />
         </section>
         <section className="flex flex-col justify-center items-center">
-          <img src={logo} alt="SISPROMED" />
+          <img src={logo} alt="Sispromed" />
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col gap-4 w-full max-w-lg p-4"

@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { describe, it, expect, beforeEach } from "vitest";
-import Login from "@/pages/Login";
+import Login from "@/pages/login";
 
 beforeEach(() => {
   render(

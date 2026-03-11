@@ -1,71 +1,36 @@
 import { DataTable } from "@/components/data-table";
-import { useState } from "react";
+import type { Convenio } from "@/types/convenio";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { consultarPacientes } from "@/service/api";
-import type { Paciente } from "@/types/paciente";
-import { Button } from "@/components/ui/button";
-import ModalPaciente from "@/components/Modals/paciente";
+import { consultarConvenios } from "@/service/api";
+import type { ColumnDef } from "@tanstack/react-table";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { ColumnDef } from "@tanstack/react-table";
+import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Plus } from "lucide-react";
-import { formatarCPF, formatarTelefone } from "@/utils/format";
+import BuscarTable from "@/components/buscar-table";
+import ModalConvenio from "@/components/Modals/convenio";
 import { AxiosError } from "axios";
-import FiltroTable from "@/components/filtro-table";
 
 type StatusFiltro = "Todos" | "Nome";
 
-export default function Pacientes() {
-  const [data, setData] = useState<Paciente[]>([]);
-  const [isModal, setIsModal] = useState(false);
+export default function Convenios() {
+  const [data, setData] = useState<Convenio[]>([]);
+  const [busca, setBusca] = useState("");
   const [acaoModal, setAcaoModal] = useState<"criar" | "editar">("criar");
   const [itemID, setItemID] = useState(0);
-  const [busca, setBusca] = useState("");
+  const [isModal, setIsModal] = useState(false);
   const [statusFiltro, setStatusFiltro] = useState<StatusFiltro>("Nome");
   const [isLoading, setIsLoading] = useState(false);
 
-  const columns: ColumnDef<Paciente>[] = [
+  const columns: ColumnDef<Convenio>[] = [
     {
       accessorKey: "nome",
       header: "Nome",
-    },
-    {
-      accessorKey: "cpf",
-      header: "CPF",
-      cell: ({ row }) => {
-        return <span>{formatarCPF(row.original.cpf)}</span>;
-      },
-    },
-    {
-      accessorKey: "telefone",
-      header: "Telefone",
-      cell: ({ row }) => {
-        return <span>{formatarTelefone(row.original.telefone)}</span>;
-      },
-    },
-    {
-      accessorKey: "uf",
-      header: "UF",
-    },
-    {
-      accessorKey: "municipio",
-      header: "Município",
-    },
-    {
-      accessorKey: "bairro",
-      header: "Bairro",
-    },
-    {
-      accessorKey: "rua",
-      header: "Rua",
-    },
-    {
-      accessorKey: "numero",
-      header: "Número",
     },
     {
       id: "actions",
@@ -73,16 +38,19 @@ export default function Pacientes() {
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
+              <Button
+                variant="ghost"
+                className="h-8 w-8 p-0 flex justify-self-end"
+              >
+                <span className="sr-only">Abrir menu</span>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-
             <DropdownMenuContent align="end">
               <DropdownMenuItem
                 onClick={() => {
-                  setItemID(row.original.id);
                   setAcaoModal("editar");
+                  setItemID(row.original.id);
                   setIsModal(true);
                 }}
               >
@@ -95,34 +63,38 @@ export default function Pacientes() {
     },
   ];
 
-  async function listar(busca: string = "", statusFiltro: string = "") {
+  async function listar(
+    tipo: "busca" | "filtro" | "" = "",
+    categoria: string = "",
+    busca: string = ""
+  ) {
     try {
-      const response = await consultarPacientes(
-        busca?.toUpperCase(),
-        statusFiltro?.toUpperCase()
-      );
+      setIsLoading(true);
+      const response = await consultarConvenios(busca, categoria);
       setData(response);
     } catch (error) {
       if (error instanceof AxiosError) {
         toast.error(
-          error.response?.data?.message ?? "Erro ao consultar paciente"
+          error.response?.data?.message ?? "Erro ao consultar convênios"
         );
       }
+    } finally {
+      setIsLoading(false);
     }
   }
 
   return (
     <>
-      <ModalPaciente
+      <ModalConvenio
+        acao={acaoModal}
         isOpen={isModal}
         setIsOpen={setIsModal}
-        acao={acaoModal}
         reload={listar}
         id={itemID}
       />
       <main>
         <section className="flex justify-between pb-1">
-          <FiltroTable
+          <BuscarTable
             filtros={["Todos", "Nome"]}
             busca={busca}
             setBusca={setBusca}
@@ -138,7 +110,7 @@ export default function Pacientes() {
               }}
             >
               <Plus />
-              Criar novo paciente
+              Criar novo convênio
             </Button>
           </div>
         </section>
@@ -147,7 +119,7 @@ export default function Pacientes() {
           loading={isLoading}
           columns={columns}
           data={data}
-          emptyMessage={"Nenhum paciente encontrado."}
+          emptyMessage={"Nenhum convênio encontrado."}
         />
       </main>
     </>

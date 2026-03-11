@@ -42,7 +42,7 @@ const formSchema = z.object({
     .number()
     .nullable()
     .refine((v) => v !== null, "Obrigatório"),
-  observacao: z.string().toUpperCase().optional().nullable(),
+  observacao: z.string().optional().nullable(),
 });
 
 export type FormFieldsLesaoAcompanhamento = z.infer<typeof formSchema>;
@@ -170,7 +170,7 @@ export default function ModalLesaoAcompanhamento({
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel>Observação</FieldLabel>
-                  <Textarea className="uppercase" {...field} />
+                  <Textarea {...field} />
                   <FieldError errors={[fieldState.error]} />
                 </Field>
               )}

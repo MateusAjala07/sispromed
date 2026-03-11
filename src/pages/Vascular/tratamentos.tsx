@@ -1,9 +1,8 @@
 import { DataTable } from "@/components/data-table";
-import type { Convenio } from "@/types/convenio";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
-import { consultarConvenios } from "@/service/api";
-import type { ColumnDef } from "@tanstack/react-table";
+import { consultarTratamentos } from "@/service/api";
+import type { Tratamento } from "@/types/tratamento";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,21 +11,23 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Plus } from "lucide-react";
-import FiltroTable from "@/components/filtro-table";
-import ModalConvenio from "@/components/Modals/convenio";
+import type { ColumnDef } from "@tanstack/react-table";
+import BuscarTable from "@/components/buscar-table";
+import ModalTratamento from "@/components/Modals/tratamento";
+import { AxiosError } from "axios";
 
 type StatusFiltro = "Todos" | "Nome";
 
-export default function Convenios() {
-  const [data, setData] = useState<Convenio[]>([]);
+export default function Tratamentos() {
+  const [data, setData] = useState<Tratamento[]>([]);
   const [busca, setBusca] = useState("");
   const [acaoModal, setAcaoModal] = useState<"criar" | "editar">("criar");
-  const [itemID, setItemID] = useState(0);
   const [isModal, setIsModal] = useState(false);
   const [statusFiltro, setStatusFiltro] = useState<StatusFiltro>("Nome");
+  const [itemID, setItemID] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
-  const columns: ColumnDef<Convenio>[] = [
+  const columns: ColumnDef<Tratamento>[] = [
     {
       accessorKey: "nome",
       header: "Nome",
@@ -62,16 +63,21 @@ export default function Convenios() {
     },
   ];
 
-  async function listar(busca: string = "", statusFiltro: string = "") {
+  async function listar(
+    tipo: "busca" | "filtro" | "" = "",
+    categoria: string = "",
+    busca: string = ""
+  ) {
     try {
       setIsLoading(true);
-      const response = await consultarConvenios(
-        busca?.toUpperCase(),
-        statusFiltro?.toUpperCase()
-      );
+      const response = await consultarTratamentos(busca, categoria);
       setData(response);
     } catch (error) {
-      toast.error(error?.message);
+      if (error instanceof AxiosError) {
+        toast.error(
+          error.response?.data?.message ?? "Erro ao consultar tratamentos"
+        );
+      }
     } finally {
       setIsLoading(false);
     }
@@ -79,7 +85,7 @@ export default function Convenios() {
 
   return (
     <>
-      <ModalConvenio
+      <ModalTratamento
         acao={acaoModal}
         isOpen={isModal}
         setIsOpen={setIsModal}
@@ -88,7 +94,7 @@ export default function Convenios() {
       />
       <main>
         <section className="flex justify-between pb-1">
-          <FiltroTable
+          <BuscarTable
             filtros={["Todos", "Nome"]}
             busca={busca}
             setBusca={setBusca}
@@ -104,7 +110,7 @@ export default function Convenios() {
               }}
             >
               <Plus />
-              Criar novo convênio
+              Criar novo tratamento
             </Button>
           </div>
         </section>
@@ -113,7 +119,7 @@ export default function Convenios() {
           loading={isLoading}
           columns={columns}
           data={data}
-          emptyMessage={"Nenhum convênio encontrado."}
+          emptyMessage={"Nenhum tratamento encontrado."}
         />
       </main>
     </>

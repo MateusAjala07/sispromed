@@ -10,13 +10,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Plus } from "lucide-react";
+import { MoreHorizontal, Plus, Settings } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import Alerta from "@/components/alerta";
 import { toast } from "sonner";
 import type { Acompanhamento } from "@/types/acompanhamento";
 import { AxiosError } from "axios";
-import FiltroTable from "@/components/filtro-table";
+import BuscarTable from "@/components/buscar-table";
 import {
   Tooltip,
   TooltipContent,
@@ -24,8 +24,10 @@ import {
 } from "@/components/ui/tooltip";
 import ModalHistoricoLesoes from "@/components/Modals/historico-lesoes";
 import ModalHistoricoTratamentos from "@/components/Modals/historico-tratamentos";
+import { Badge } from "@/components/ui/badge";
+import FiltrarTable from "@/components/filtrar-table";
 
-type StatusFiltro =
+type StatusBusca =
   | "Todos"
   | "Paciente"
   | "Convenio"
@@ -47,7 +49,8 @@ export default function Acompanhamentos() {
 
   const [acaoModal, setAcaoModal] = useState<"criar" | "editar" | undefined>();
   const [itemID, setItemID] = useState(0);
-  const [statusFiltro, setStatusFiltro] = useState<StatusFiltro>("Paciente");
+  const [statusBusca, setStatusBusca] = useState<StatusBusca>("Paciente");
+  const [categoriaFiltro, setCategoriaFiltro] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const columns: ColumnDef<Acompanhamento>[] = [
@@ -90,6 +93,15 @@ export default function Acompanhamentos() {
       },
     },
     { accessorKey: "paciente", header: "Paciente" },
+    {
+      accessorKey: "idade",
+      header: "Idade",
+      cell: ({ row }) => {
+        return (
+          <div className="flex justify-self-center">{row.original.idade}</div>
+        );
+      },
+    },
     {
       accessorKey: "convenio",
       header: () => <div className="w-30">Convênio</div>,
@@ -164,13 +176,60 @@ export default function Acompanhamentos() {
     {
       accessorKey: "ultimo_usv",
       header: "Último USV",
-      cell: ({ row }) =>
-        row.original.ultimo_usv
-          ? row.original.ultimo_usv.split("-").reverse().join("/")
-          : "-",
+      cell: ({ row }) => {
+        const variant = row.original.prazo_doppler_vencido
+          ? "destructive"
+          : "outline";
+
+        return (
+          <div>
+            <Badge variant={variant} className={`px-2 py-1 rounded-md`}>
+              {row.original.ultimo_usv
+                ? row.original.ultimo_usv.split("-").reverse().join("/")
+                : "-"}
+            </Badge>
+          </div>
+        );
+      },
     },
-    { accessorKey: "lesao_50", header: "Lesão 50%" },
-    { accessorKey: "alteracao_clinica", header: "Alteração Clínica" },
+    {
+      accessorKey: "lesao_50",
+      header: "Lesão 50%",
+      cell: ({ row }) => {
+        const variant =
+          row.original.lesao_50 === "Sim" ? "destructive" : "outline";
+
+        return (
+          <div>
+            <Badge
+              variant={variant}
+              className={`flex justify-self-center px-2 py-1 rounded-md`}
+            >
+              {row.original.lesao_50}
+            </Badge>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "alteracao_clinica",
+      header: "Alteração Clínica",
+      cell: ({ row }) => {
+        const variant =
+          row.original.alteracao_clinica === "Sim" ? "destructive" : "outline";
+
+        return (
+          <div>
+            <Badge
+              variant={variant}
+              className={`flex justify-self-center px-2 py-1 rounded-md`}
+            >
+              {row.original.alteracao_clinica}
+            </Badge>
+          </div>
+        );
+      },
+    },
     {
       accessorKey: "lesoes",
       header: "Lesões",
@@ -212,13 +271,14 @@ export default function Acompanhamentos() {
     { accessorKey: "observacao", header: "Observação" },
   ];
 
-  async function listar(busca: string = "", statusFiltro: string = "") {
+  async function listar(
+    tipo: "busca" | "filtro" | "" = "",
+    categoria: string = "",
+    busca: string = ""
+  ) {
     try {
       setIsLoading(true);
-      const response = await consultarAcompanhamentos(
-        busca?.toUpperCase(),
-        statusFiltro?.toUpperCase()
-      );
+      const response = await consultarAcompanhamentos(tipo, categoria, busca);
       setData(response);
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -283,22 +343,31 @@ export default function Acompanhamentos() {
 
       <main>
         <section className="flex justify-between flex-wrap gap-2 pb-1">
-          <FiltroTable
-            filtros={[
-              "Todos",
-              "Paciente",
-              "Convênio",
-              "Clínica",
-              "Nefrologista",
-              "Cateter",
-            ]}
-            busca={busca}
-            setBusca={setBusca}
-            statusFiltro={statusFiltro}
-            setStatusFiltro={setStatusFiltro}
-            listar={listar}
-          />
-          <div>
+          <div className="flex gap-2">
+            <BuscarTable
+              filtros={[
+                "Todos",
+                "Paciente",
+                "Convênio",
+                "Clínica",
+                "Nefrologista",
+                "Cateter",
+              ]}
+              busca={busca}
+              setBusca={setBusca}
+              statusFiltro={statusBusca}
+              setStatusFiltro={setStatusBusca}
+              listar={listar}
+            />
+            <FiltrarTable
+              filtros={["Todos", "USV Vencido"]}
+              listar={listar}
+              statusFiltro={categoriaFiltro}
+              setStatusFiltro={setCategoriaFiltro}
+            />
+          </div>
+
+          <div className="flex gap-2">
             <Button
               onClick={() => {
                 setAcaoModal("criar");

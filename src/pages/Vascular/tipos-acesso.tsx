@@ -1,32 +1,34 @@
 import { DataTable } from "@/components/data-table";
 import { useState } from "react";
 import { toast } from "sonner";
-import { consultarMedicos } from "@/service/api";
+import { consultarTiposAcessos } from "@/service/api";
 import type { Medico } from "@/types/medico";
-import { Button } from "@/components/ui/button";
+import type { ColumnDef } from "@tanstack/react-table";
+import type { TipoAcesso } from "@/types/tipoAcesso";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Plus } from "lucide-react";
-import type { ColumnDef } from "@tanstack/react-table";
-import FiltroTable from "@/components/filtro-table";
-import ModalNefrologista from "@/components/Modals/nefrologista";
+import BuscarTable from "@/components/buscar-table";
+import ModalTipoAcesso from "@/components/Modals/tipo-acesso";
+import { AxiosError } from "axios";
 
 type StatusFiltro = "Todos" | "Nome";
 
-export default function Nefrologistas() {
+export default function TiposAcesso() {
   const [data, setData] = useState<Medico[]>([]);
-  const [isModal, setIsModal] = useState(false);
-  const [acaoModal, setAcaoModal] = useState<"criar" | "editar">("criar");
-  const [statusFiltro, setStatusFiltro] = useState<StatusFiltro>("Nome");
   const [busca, setBusca] = useState("");
+  const [acaoModal, setAcaoModal] = useState<"criar" | "editar">("criar");
+  const [isModal, setIsModal] = useState(false);
+  const [statusFiltro, setStatusFiltro] = useState<StatusFiltro>("Nome");
   const [itemID, setItemID] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
-  const columns: ColumnDef<Medico>[] = [
+  const columns: ColumnDef<TipoAcesso>[] = [
     {
       accessorKey: "nome",
       header: "Nome",
@@ -62,17 +64,21 @@ export default function Nefrologistas() {
     },
   ];
 
-  async function listar(busca: string = "", statusFiltro: string = "") {
+  async function listar(
+    tipo: "busca" | "filtro" | "" = "",
+    categoria: string = "",
+    busca: string = ""
+  ) {
     try {
       setIsLoading(true);
-      const response = await consultarMedicos(
-        1,
-        busca?.toUpperCase(),
-        statusFiltro?.toUpperCase()
-      );
+      const response = await consultarTiposAcessos(busca, categoria);
       setData(response);
     } catch (error) {
-      toast.error(error?.message);
+      if (error instanceof AxiosError) {
+        toast.error(
+          error.response?.data?.message ?? "Erro ao consultar tipos de acessos"
+        );
+      }
     } finally {
       setIsLoading(false);
     }
@@ -80,7 +86,7 @@ export default function Nefrologistas() {
 
   return (
     <>
-      <ModalNefrologista
+      <ModalTipoAcesso
         acao={acaoModal}
         isOpen={isModal}
         setIsOpen={setIsModal}
@@ -89,7 +95,7 @@ export default function Nefrologistas() {
       />
       <main>
         <section className="flex justify-between pb-1">
-          <FiltroTable
+          <BuscarTable
             filtros={["Todos", "Nome"]}
             busca={busca}
             setBusca={setBusca}
@@ -105,7 +111,7 @@ export default function Nefrologistas() {
               }}
             >
               <Plus />
-              Criar novo nefrologista
+              Criar novo tipo de acesso
             </Button>
           </div>
         </section>
@@ -114,7 +120,7 @@ export default function Nefrologistas() {
           loading={isLoading}
           columns={columns}
           data={data}
-          emptyMessage={"Nenhum nefrologista encontrado."}
+          emptyMessage={"Nenhum tipo de acesso encontrado."}
         />
       </main>
     </>

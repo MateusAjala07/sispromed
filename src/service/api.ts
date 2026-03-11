@@ -19,6 +19,7 @@ import type { FormFieldsTratamento } from "@/components/Modals/tratamento";
 import type { DashboardVascular } from "@/types/dashboardVascular";
 import type { FormFieldsLesaoAcompanhamento } from "@/components/Modals/lesao-acompanhamento";
 import type { FormFieldsTratamentoAcompanhamento } from "@/components/Modals/tratamento-acompanhamento";
+import type { FormFieldsPrazoDoppler } from "@/components/Modals/prazo-doppler";
 
 export const api = axios.create({
   baseURL: "http://localhost:8086",
@@ -117,11 +118,12 @@ export const efetuarLogout = async () => {
 };
 
 export const consultarAcompanhamentos = async (
-  q = "",
-  category = ""
+  tipo = "",
+  category = "",
+  q = ""
 ): Promise<object> => {
   const { data } = await api.get(`/acompanhamentos`, {
-    params: { q, category },
+    params: { tipo, category, q },
   });
   return data;
 };
@@ -445,6 +447,23 @@ export const consultarCateteres = async (
 
 export const consultarDashboardVascular =
   async (): Promise<DashboardVascular> => {
-    const { data } = await api.get("vascular/dashboard");
+    const { data } = await api.get("/vascular/dashboard");
     return data;
   };
+
+export const consultarPrazoDoppler = async (): Promise<object> => {
+  const { data } = await api.get("/empresa/prazo-doppler");
+  return data;
+};
+
+export const editarPrazoDoppler = async (
+  body: FormFieldsPrazoDoppler
+): Promise<object> => {
+  const { data } = await api.put("/empresa/prazo-doppler", body);
+  return data;
+};
+
+export const consultarUsuarios = async (): Promise<object> => {
+  const { data } = await api.get("/usuarios");
+  return data;
+};

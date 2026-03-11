@@ -53,8 +53,7 @@ const formSchema = z.object({
   nome: z
     .string()
     .min(3, "O nome deve ter no mínimo 3 caracteres")
-    .max(45, "O nome deve ter no máximo 45 caracteres")
-    .toUpperCase(),
+    .max(45, "O nome deve ter no máximo 45 caracteres"),
   genero: z.string().min(1, "Obrigatório"),
   data_nascimento: z.string().min(1, "Obrigatório"),
   telefone: z
@@ -65,23 +64,19 @@ const formSchema = z.object({
   municipio: z
     .string()
     .min(3, "O município deve ter no mínimo 3 caracteres")
-    .max(95, "O município deve ter no máximo 95 caracteres")
-    .toUpperCase(),
+    .max(95, "O município deve ter no máximo 95 caracteres"),
   bairro: z
     .string()
     .min(3, "O bairro deve ter no mínimo 3 caracteres")
-    .max(80, "O bairro deve ter no máximo 80 caracteres")
-    .toUpperCase(),
+    .max(80, "O bairro deve ter no máximo 80 caracteres"),
   rua: z
     .string()
     .min(3, "A rua deve ter no mínimo 3 caracteres")
-    .max(80, "A rua deve ter no máximo 80 caracteres")
-    .toUpperCase(),
+    .max(80, "A rua deve ter no máximo 80 caracteres"),
   numero: z
     .string()
     .min(1, "Obrigatório")
-    .max(10, "O número deve ter no máximo 80 caracteres")
-    .toUpperCase(),
+    .max(10, "O número deve ter no máximo 80 caracteres"),
 });
 
 export type FormFieldsPaciente = z.infer<typeof formSchema>;
@@ -216,7 +211,6 @@ export default function ModalPaciente({
                     Nome <span className="text-destructive">*</span>
                   </FieldLabel>
                   <Input
-                    className="uppercase"
                     {...field}
                     id={field.name}
                     aria-invalid={fieldState.invalid}
@@ -370,7 +364,6 @@ export default function ModalPaciente({
                       </FieldLabel>
                       <Input
                         {...field}
-                        className="uppercase"
                         id={field.name}
                         aria-invalid={fieldState.invalid}
                         autoComplete="off"
@@ -394,7 +387,6 @@ export default function ModalPaciente({
                   </FieldLabel>
                   <Input
                     {...field}
-                    className="uppercase"
                     id={field.name}
                     aria-invalid={fieldState.invalid}
                     autoComplete="off"
@@ -418,7 +410,6 @@ export default function ModalPaciente({
                       </FieldLabel>
                       <Input
                         {...field}
-                        className="uppercase"
                         id={field.name}
                         aria-invalid={fieldState.invalid}
                         autoComplete="off"
@@ -441,7 +432,6 @@ export default function ModalPaciente({
                     </FieldLabel>
                     <Input
                       {...field}
-                      className="uppercase"
                       id={field.name}
                       aria-invalid={fieldState.invalid}
                       autoComplete="off"

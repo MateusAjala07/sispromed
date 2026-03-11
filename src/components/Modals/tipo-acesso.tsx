@@ -32,8 +32,7 @@ const formSchema = z.object({
   nome: z
     .string()
     .min(3, "O nome deve ter no mínimo 3 caracteres")
-    .max(50, "O nome deve ter no máximo 50 caracteres")
-    .toUpperCase(),
+    .max(50, "O nome deve ter no máximo 50 caracteres"),
 });
 
 export type FormFieldsTipoAcesso = z.infer<typeof formSchema>;
@@ -124,7 +123,6 @@ export default function ModalTipoAcesso({
                     Nome <span className="text-destructive">*</span>
                   </FieldLabel>
                   <Input
-                    className="uppercase"
                     {...field}
                     id={field.name}
                     aria-invalid={fieldState.invalid}

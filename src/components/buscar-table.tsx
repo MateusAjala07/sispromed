@@ -10,29 +10,37 @@ import { useEffect, useRef } from "react";
 import { Input } from "./ui/input";
 import { useDebounce } from "@/utils/utils";
 
-type FiltroTableProps = {
+type BuscarTableProps = {
   filtros: string[];
   busca: string;
   setBusca: (v: string) => void;
   statusFiltro: string;
   setStatusFiltro: (v: string) => void;
-  listar: (busca: string, statusFiltro: string) => Promise<void>;
+  listar: (
+    tipo?: "busca" | "filtro" | "",
+    categoria?: string,
+    busca?: string
+  ) => Promise<void>;
 };
 
-export default function FiltroTable({
+export default function BuscarTable({
   filtros,
   busca,
   setBusca,
   statusFiltro,
   setStatusFiltro,
   listar,
-}: FiltroTableProps) {
+}: BuscarTableProps) {
   const inputRefBusca = useRef<HTMLInputElement>(null);
 
   const debouncedBusca = useDebounce(busca, 500);
 
   useEffect(() => {
-    listar(debouncedBusca, statusFiltro);
+    if (statusFiltro !== "Todos") {
+      listar("busca", statusFiltro, debouncedBusca);
+    } else {
+      listar();
+    }
   }, [debouncedBusca, statusFiltro]);
 
   useEffect(() => {
@@ -48,7 +56,7 @@ export default function FiltroTable({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline">
-            {statusFiltro === "Todos" ? "Filtrar por" : statusFiltro}
+            {statusFiltro === "Todos" ? "Buscar por" : statusFiltro}
             <ChevronDown className="ml-2 h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
@@ -76,7 +84,7 @@ export default function FiltroTable({
           placeholder="Buscar..."
           className="w-full sm:w-100"
           value={busca}
-          onChange={(e) => setBusca(e.target.value.toUpperCase())}
+          onChange={(e) => setBusca(e.target.value)}
           ref={inputRefBusca}
         />
       )}

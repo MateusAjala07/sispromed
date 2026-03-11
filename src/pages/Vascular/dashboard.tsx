@@ -25,7 +25,7 @@ import { useEffect, useState } from "react";
 import type { DashboardVascular } from "@/types/dashboardVascular";
 import { buildChart } from "@/components/buildChart";
 
-export default function Dashboard() {
+export default function DashboardVascular() {
   const [data, setData] = useState<DashboardVascular>();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -45,13 +45,13 @@ export default function Dashboard() {
 
   async function listar() {
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       const response = await consultarDashboardVascular();
       setData(response);
     } catch (error) {
       toast.error(error?.message || "Erro ao consultar dashboard");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 

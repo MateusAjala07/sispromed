@@ -115,7 +115,7 @@
 
 @layer base {
   * {
-    font-family: "Mukta", sans-serif;
+    font-family: "Inter", sans-serif;
     @apply border-border outline-ring/50;
   }
   body {
