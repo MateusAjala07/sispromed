@@ -18,36 +18,27 @@ import { Loader2 } from "lucide-react";
 
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { consultarClinica, criarClinica, editarClinica } from "@/service/api";
+import { consultarPrazoDoppler, editarPrazoDoppler } from "@/service/api";
 
-type ModalClinicaProps = {
+type ModalPrazoDopplerProps = {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  acao: "criar" | "editar";
-  id?: number;
-  reload: () => Promise<void>;
 };
 
 const formSchema = z.object({
-  nome: z
-    .string()
-    .min(3, "O nome deve ter no mínimo 3 caracteres")
-    .max(50, "O nome deve ter no máximo 50 caracteres")
+  prazo_doppler: z.coerce.number().min(1, "Insira o prazo do doppler"),
 });
 
-export type FormFieldsClinica = z.infer<typeof formSchema>;
+export type FormFieldsPrazoDoppler = z.infer<typeof formSchema>;
 
-const defaultValoresFormulario: FormFieldsClinica = {
-  nome: "",
+const defaultValoresFormulario: FormFieldsPrazoDoppler = {
+  prazo: null,
 };
 
-export default function ModalClinica({
+export default function ModalPrazoDoppler({
   isOpen,
   setIsOpen,
-  acao,
-  id,
-  reload,
-}: ModalClinicaProps) {
+}: ModalPrazoDopplerProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: defaultValoresFormulario,
@@ -55,68 +46,55 @@ export default function ModalClinica({
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
     try {
-      let response: object;
-
-      if (acao === "criar") {
-        response = await criarClinica(data);
-      } else if (acao === "editar") {
-        response = await editarClinica(id, data);
-      }
-
-      await reload();
-      setIsOpen(false);
+      const response = await editarPrazoDoppler(data);
       toast.success(response.message);
+      setIsOpen(false);
     } catch (error) {
       if (error instanceof AxiosError) {
-        toast.error(error.response?.data?.message ?? "Erro ao salvar clínica");
+        toast.error(
+          error.response?.data?.message ?? "Erro ao salvar prazo do doppler"
+        );
       }
     }
   }
 
   useEffect(() => {
-    if (!isOpen || acao === "criar") {
-      form.reset(defaultValoresFormulario);
-    }
-  }, [isOpen, acao]);
-
-  useEffect(() => {
-    if (!isOpen || acao === "criar" || !id) return;
+    if (!isOpen) return;
 
     (async () => {
       try {
-        const res = await consultarClinica(id);
+        const res = await consultarPrazoDoppler();
 
         form.reset({
           ...res,
-          nome: res.nome,
+          prazo_doppler: res.prazo_doppler,
         });
       } catch (error) {
-        toast.error("Erro ao carregar clínica");
+        toast.error("Erro ao carregar prazo do doppler");
       }
     })();
-  }, [isOpen, id, acao]);
+  }, [isOpen]);
 
   return (
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <DialogHeader>
-              <DialogTitle>
-                {acao === "criar" ? "Nova Clínica" : "Editar Clínica"}
-              </DialogTitle>
+            <DialogHeader className="mb-3">
+              <DialogTitle>Configuração do Sistema</DialogTitle>
               <DialogDescription>
-                Insira informações da clínica
+                Configure o período de alerta para a data do último USV.
               </DialogDescription>
             </DialogHeader>
 
             <Controller
-              name="nome"
+              name="prazo_doppler"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
-                    Nome <span className="text-destructive">*</span>
+                    Prazo para doppler (dias){" "}
+                    <span className="text-destructive">*</span>
                   </FieldLabel>
                   <Input
                     {...field}

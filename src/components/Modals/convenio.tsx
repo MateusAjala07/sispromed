@@ -37,7 +37,6 @@ const formSchema = z.object({
     .string()
     .min(3, "O nome deve ter no mínimo 3 caracteres")
     .max(50, "O nome deve ter no máximo 50 caracteres")
-    .toUpperCase(),
 });
 
 export type FormFieldsConvenio = z.infer<typeof formSchema>;
@@ -123,7 +122,6 @@ export default function ModalConvenio({
                     Nome <span className="text-destructive">*</span>
                   </FieldLabel>
                   <Input
-                    className="uppercase"
                     {...field}
                     id={field.name}
                     aria-invalid={fieldState.invalid}

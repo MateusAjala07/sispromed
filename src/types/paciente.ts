@@ -5,9 +5,11 @@ export type Paciente = {
   data_nascimento: string,
   telefone: string;
   nome: string;
+  idade: number;
   uf: string;
   municipio: string;
   bairro: string;
   rua: string;
   numero: string;
+  ativo: boolean;
 };

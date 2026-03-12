@@ -39,6 +39,7 @@ import { formatarTelefone, formatarCPF } from "@/utils/format";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import { Checkbox } from "../ui/checkbox";
 
 type ModalPacienteProps = {
   isOpen: boolean;
@@ -53,8 +54,7 @@ const formSchema = z.object({
   nome: z
     .string()
     .min(3, "O nome deve ter no mínimo 3 caracteres")
-    .max(45, "O nome deve ter no máximo 45 caracteres")
-    .toUpperCase(),
+    .max(45, "O nome deve ter no máximo 45 caracteres"),
   genero: z.string().min(1, "Obrigatório"),
   data_nascimento: z.string().min(1, "Obrigatório"),
   telefone: z
@@ -65,23 +65,20 @@ const formSchema = z.object({
   municipio: z
     .string()
     .min(3, "O município deve ter no mínimo 3 caracteres")
-    .max(95, "O município deve ter no máximo 95 caracteres")
-    .toUpperCase(),
+    .max(95, "O município deve ter no máximo 95 caracteres"),
   bairro: z
     .string()
     .min(3, "O bairro deve ter no mínimo 3 caracteres")
-    .max(80, "O bairro deve ter no máximo 80 caracteres")
-    .toUpperCase(),
+    .max(80, "O bairro deve ter no máximo 80 caracteres"),
   rua: z
     .string()
     .min(3, "A rua deve ter no mínimo 3 caracteres")
-    .max(80, "A rua deve ter no máximo 80 caracteres")
-    .toUpperCase(),
+    .max(80, "A rua deve ter no máximo 80 caracteres"),
   numero: z
     .string()
     .min(1, "Obrigatório")
-    .max(10, "O número deve ter no máximo 80 caracteres")
-    .toUpperCase(),
+    .max(10, "O número deve ter no máximo 80 caracteres"),
+  ativo: z.boolean().default(true),
 });
 
 export type FormFieldsPaciente = z.infer<typeof formSchema>;
@@ -97,6 +94,7 @@ const defaultValoresFormulario: FormFieldsPaciente = {
   bairro: "",
   rua: "",
   numero: "",
+  ativo: true,
 };
 
 export default function ModalPaciente({
@@ -155,6 +153,7 @@ export default function ModalPaciente({
           municipio: res.municipio,
           rua: res.rua,
           numero: res.numero,
+          ativo: res.ativo,
         });
       } catch (error) {
         toast.error("Erro ao carregar paciente");
@@ -178,6 +177,27 @@ export default function ModalPaciente({
                 Insira informações do paciente
               </DialogDescription>
             </DialogHeader>
+
+            <Controller
+              name="nome"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>
+                    Nome <span className="text-destructive">*</span>
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    autoComplete="off"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
 
             <Controller
               name="cpf"
@@ -208,28 +228,6 @@ export default function ModalPaciente({
             />
 
             <Controller
-              name="nome"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>
-                    Nome <span className="text-destructive">*</span>
-                  </FieldLabel>
-                  <Input
-                    className="uppercase"
-                    {...field}
-                    id={field.name}
-                    aria-invalid={fieldState.invalid}
-                    autoComplete="off"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-
-            <Controller
               name="genero"
               control={form.control}
               render={({ field, fieldState }) => (
@@ -237,7 +235,11 @@ export default function ModalPaciente({
                   <FieldLegend variant="label">
                     Gênero <span className="text-destructive">*</span>
                   </FieldLegend>
-                  <RadioGroup name={field.name} value={field.value} onValueChange={field.onChange}>
+                  <RadioGroup
+                    name={field.name}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  >
                     <Field
                       orientation="horizontal"
                       data-invalid={fieldState.invalid}
@@ -370,7 +372,6 @@ export default function ModalPaciente({
                       </FieldLabel>
                       <Input
                         {...field}
-                        className="uppercase"
                         id={field.name}
                         aria-invalid={fieldState.invalid}
                         autoComplete="off"
@@ -394,7 +395,6 @@ export default function ModalPaciente({
                   </FieldLabel>
                   <Input
                     {...field}
-                    className="uppercase"
                     id={field.name}
                     aria-invalid={fieldState.invalid}
                     autoComplete="off"
@@ -418,7 +418,6 @@ export default function ModalPaciente({
                       </FieldLabel>
                       <Input
                         {...field}
-                        className="uppercase"
                         id={field.name}
                         aria-invalid={fieldState.invalid}
                         autoComplete="off"
@@ -441,7 +440,6 @@ export default function ModalPaciente({
                     </FieldLabel>
                     <Input
                       {...field}
-                      className="uppercase"
                       id={field.name}
                       aria-invalid={fieldState.invalid}
                       autoComplete="off"
@@ -453,6 +451,23 @@ export default function ModalPaciente({
                 )}
               />
             </section>
+
+            <Controller
+              name="ativo"
+              control={form.control}
+              render={({ field }) => (
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    id="ativo"
+                  />
+                  <label htmlFor="ativo" className="text-sm select-none">
+                    Ativo
+                  </label>
+                </div>
+              )}
+            />
 
             <DialogFooter className="pt-5">
               <DialogClose asChild>

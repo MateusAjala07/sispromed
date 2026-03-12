@@ -22,6 +22,7 @@ import {
   efetuarLoginGoogle,
   efetuarLogout,
 } from "@/service/api.ts";
+import { toast } from "sonner";
 
 const schema = z.object({
   email: z.email("Email inválido"),
@@ -31,7 +32,9 @@ const schema = z.object({
 type FormFields = z.infer<typeof schema>;
 
 export default function Login() {
+  const resetState = useGlobalState((state) => state.resetState);
   const setNome = useGlobalState((state) => state.setNomeUsuario);
+  const setPerfil = useGlobalState((state) => state.setPerfilUsuario);
 
   const {
     register,
@@ -49,7 +52,8 @@ export default function Login() {
     try {
       const { email, senha } = data;
       const response = await efetuarLogin(email, senha);
-      setNome(response);
+      setNome(response.nome);
+      setPerfil(response.perfil);
       navigate("/vascular/dashboard");
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -61,6 +65,7 @@ export default function Login() {
   };
 
   async function logout() {
+    resetState();
     await efetuarLogout();
   }
 
@@ -75,7 +80,7 @@ export default function Login() {
           <img src={clinica} alt="clinica" />
         </section>
         <section className="flex flex-col justify-center items-center">
-          <img src={logo} alt="SISPROMED" />
+          <img src={logo} alt="Sispromed" />
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col gap-4 w-full max-w-lg p-4"
@@ -138,10 +143,27 @@ export default function Login() {
             <section>
               <GoogleLogin
                 onSuccess={async (credentialResponse: any) => {
-                  await efetuarLoginGoogle(credentialResponse.credential);
-                  navigate("/vascular/dashboard");
+                  try {
+                    const response = await efetuarLoginGoogle(
+                      credentialResponse.credential
+                    );
+                    setNome(response.nome);
+                    setPerfil(response.perfil);
+                    navigate("/vascular/dashboard");
+                  } catch (error) {
+                    if (error instanceof AxiosError) {
+                      setError("root", {
+                        message:
+                          error.response?.data?.message ??
+                          "Erro ao fazer login",
+                      });
+                    }
+                  }
                 }}
-                onError={() => console.error("Login failed")}
+                
+                onError={(error) => {
+                  toast.error("Erro ao realizar login");
+                }}
               />
             </section>
           </form>

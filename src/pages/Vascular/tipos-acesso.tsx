@@ -1,24 +1,26 @@
 import { DataTable } from "@/components/data-table";
 import { useState } from "react";
 import { toast } from "sonner";
-import { consultarLesoes } from "@/service/api";
-import type { Lesao } from "@/types/lesao";
-import { Button } from "@/components/ui/button";
-import FiltroTable from "@/components/filtro-table";
+import { consultarTiposAcessos } from "@/service/api";
+import type { Medico } from "@/types/medico";
 import type { ColumnDef } from "@tanstack/react-table";
+import type { TipoAcesso } from "@/types/tipoAcesso";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Plus } from "lucide-react";
-import ModalLesao from "@/components/Modals/lesao";
+import BuscarTable from "@/components/buscar-table";
+import ModalTipoAcesso from "@/components/Modals/tipo-acesso";
+import { AxiosError } from "axios";
 
 type StatusFiltro = "Todos" | "Nome";
 
-export default function Lesoes() {
-  const [data, setData] = useState<Lesao[]>([]);
+export default function TiposAcesso() {
+  const [data, setData] = useState<Medico[]>([]);
   const [busca, setBusca] = useState("");
   const [acaoModal, setAcaoModal] = useState<"criar" | "editar">("criar");
   const [isModal, setIsModal] = useState(false);
@@ -26,7 +28,7 @@ export default function Lesoes() {
   const [itemID, setItemID] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
-  const columns: ColumnDef<Lesao>[] = [
+  const columns: ColumnDef<TipoAcesso>[] = [
     {
       accessorKey: "nome",
       header: "Nome",
@@ -62,16 +64,21 @@ export default function Lesoes() {
     },
   ];
 
-  async function listar(busca: string = "", statusFiltro: string = "") {
+  async function listar(
+    tipo: "busca" | "filtro" | "" = "",
+    categoria: string = "",
+    busca: string = ""
+  ) {
     try {
       setIsLoading(true);
-      const response = await consultarLesoes(
-        busca?.toUpperCase(),
-        statusFiltro?.toUpperCase()
-      );
+      const response = await consultarTiposAcessos(busca, categoria);
       setData(response);
     } catch (error) {
-      toast.error(error?.message);
+      if (error instanceof AxiosError) {
+        toast.error(
+          error.response?.data?.message ?? "Erro ao consultar tipos de acessos"
+        );
+      }
     } finally {
       setIsLoading(false);
     }
@@ -79,7 +86,7 @@ export default function Lesoes() {
 
   return (
     <>
-      <ModalLesao
+      <ModalTipoAcesso
         acao={acaoModal}
         isOpen={isModal}
         setIsOpen={setIsModal}
@@ -87,8 +94,8 @@ export default function Lesoes() {
         id={itemID}
       />
       <main>
-        <section className="flex justify-between pb-1">
-          <FiltroTable
+        <section className="flex justify-between flex-wrap gap-2 pb-1">
+          <BuscarTable
             filtros={["Todos", "Nome"]}
             busca={busca}
             setBusca={setBusca}
@@ -104,7 +111,7 @@ export default function Lesoes() {
               }}
             >
               <Plus />
-              Criar nova lesão
+              Criar novo tipo de acesso
             </Button>
           </div>
         </section>
@@ -113,7 +120,7 @@ export default function Lesoes() {
           loading={isLoading}
           columns={columns}
           data={data}
-          emptyMessage={"Nenhuma lesão encontrada."}
+          emptyMessage={"Nenhum tipo de acesso encontrado."}
         />
       </main>
     </>

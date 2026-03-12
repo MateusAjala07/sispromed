@@ -15,6 +15,7 @@ import {
   Users,
   ChevronDown,
   List,
+  Settings,
 } from "lucide-react";
 
 import {
@@ -27,6 +28,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarSeparator,
   useSidebar,
 } from "@/components/ui/sidebar";
 
@@ -47,6 +49,8 @@ import {
 import useGlobalState from "@/state/useGlobalState";
 
 import logo from "@/assets/images/logo-icone.png";
+import logoComsystem from "@/assets/images/logo-Comsystem.webp";
+import ModalPrazoDoppler from "./Modals/prazo-doppler";
 
 type SidebarItem = {
   title: string;
@@ -144,7 +148,7 @@ function SidebarSubmenu({ item }: { item: SidebarItem }) {
             tooltip={item.title}
           >
             <div className="flex items-center">
-              <item.icon className="mr-4 h-4 w-4" />
+              <item.icon className="mr-3 h-4 w-4" />
               {item.title}
             </div>
 
@@ -189,45 +193,53 @@ function SidebarSubmenu({ item }: { item: SidebarItem }) {
 export function AppSidebar() {
   const { pathname } = useLocation();
   const { isMobile, open } = useSidebar();
-  const nomeUsuario = useGlobalState((state) => state.nome_usuario);
+  const nomeUsuario = useGlobalState((state) => state.nomeUsuario);
+  const perfilUsuario = useGlobalState((state) => state.perfilUsuario)
+  const [isModalPrazoDoppler, setIsModalPrazoDoppler] = useState(false);
 
   return (
-    <Sidebar collapsible="icon">
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              {open ? (
-                <span className="font-semibold">SISPROMED</span>
-              ) : (
-                <img src={logo} />
-              )}
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
+    <>
+      <ModalPrazoDoppler
+        isOpen={isModalPrazoDoppler}
+        setIsOpen={setIsModalPrazoDoppler}
+      />
 
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {sidebarItems.map((item) => {
-                if (item.children) {
-                  return <SidebarSubmenu key={item.title} item={item} />;
-                }
+      <Sidebar collapsible="icon">
+        <SidebarHeader>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                {open ? (
+                  <span className="font-semibold">Sispromed</span>
+                ) : (
+                  <img src={logo} />
+                )}
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarHeader>
 
-                const active = pathname.startsWith(item.url!);
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {sidebarItems.map((item) => {
+                  if (item.children) {
+                    return <SidebarSubmenu key={item.title} item={item} />;
+                  }
 
-                return (
-                  <SidebarMenuItem key={item.title} className="relative">
-                    {active && (
-                      <div className="absolute left-0 top-1 bottom-1 w-1 rounded-r bg-primary" />
-                    )}
+                  const active = pathname.startsWith(item.url!);
 
-                    <SidebarMenuButton
-                      asChild
-                      tooltip={item.title}
-                      className={`
+                  return (
+                    <SidebarMenuItem key={item.title} className="relative">
+                      {active && (
+                        <div className="absolute left-0 top-1 bottom-1 w-1 rounded-r bg-primary" />
+                      )}
+
+                      <SidebarMenuButton
+                        asChild
+                        tooltip={item.title}
+                        className={`
                         transition-colors
                         ${
                           active
@@ -235,57 +247,83 @@ export function AppSidebar() {
                             : "hover:bg-muted"
                         }
                       `}
-                    >
-                      <Link to={item.url!}>
-                        <item.icon className="mr-2 h-4 w-4" />
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
+                      >
+                        <Link to={item.url!}>
+                          <item.icon className="mr-1 h-4 w-4" />
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
 
-      <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
-                  <User />
+        <SidebarFooter>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <SidebarMenuButton className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
+                    <User />
 
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">{nomeUsuario}</span>
-                  </div>
+                    <div className="grid flex-1 text-left text-sm leading-tight">
+                      <span className="truncate font-medium capitalize">
+                        {nomeUsuario}
+                      </span>
+                    </div>
 
-                  <EllipsisVertical className="ml-auto size-4" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
+                    <EllipsisVertical className="ml-auto size-4" />
+                  </SidebarMenuButton>
+                </DropdownMenuTrigger>
 
-              <DropdownMenuContent
-                className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-                side={isMobile ? "bottom" : "right"}
-                align="end"
-                sideOffset={4}
-              >
-                <DropdownMenuLabel>Opções</DropdownMenuLabel>
+                <DropdownMenuContent
+                  className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+                  side={isMobile ? "bottom" : "right"}
+                  align="end"
+                  sideOffset={4}
+                >
+                  <DropdownMenuLabel>Opções</DropdownMenuLabel>
 
-                <DropdownMenuSeparator />
+                  {perfilUsuario === 1 && (
+                    <Link to={"/vascular/usuarios"}>
+                      <DropdownMenuItem variant="outline">
+                        <Users />
+                        Usuários
+                      </DropdownMenuItem>
+                    </Link>
+                  )}
 
-                <Link to={"/login"} replace>
-                  <DropdownMenuItem>
-                    <LogOut />
-                    Sair
+                  <DropdownMenuItem
+                    variant={"outline"}
+                    onClick={() => setIsModalPrazoDoppler(true)}
+                  >
+                    <Settings /> Configurações
                   </DropdownMenuItem>
-                </Link>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
-    </Sidebar>
+
+                  <DropdownMenuSeparator />
+                  <Link to={"/login"} replace>
+                    <DropdownMenuItem>
+                      <LogOut />
+                      Sair
+                    </DropdownMenuItem>
+                  </Link>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </SidebarMenuItem>
+            <SidebarSeparator />
+            <SidebarMenuItem>
+              <img
+                src={logoComsystem}
+                alt="Comsystem"
+                className="flex justify-self-center mt-3 mb-5 w-30"
+              />
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
+      </Sidebar>
+    </>
   );
 }

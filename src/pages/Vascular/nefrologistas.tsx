@@ -1,71 +1,36 @@
 import { DataTable } from "@/components/data-table";
 import { useState } from "react";
 import { toast } from "sonner";
-import { consultarPacientes } from "@/service/api";
-import type { Paciente } from "@/types/paciente";
+import { consultarMedicos } from "@/service/api";
+import type { Medico } from "@/types/medico";
 import { Button } from "@/components/ui/button";
-import ModalPaciente from "@/components/Modals/paciente";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal, Plus } from "lucide-react";
-import { formatarCPF, formatarTelefone } from "@/utils/format";
+import type { ColumnDef } from "@tanstack/react-table";
+import BuscarTable from "@/components/buscar-table";
+import ModalNefrologista from "@/components/Modals/nefrologista";
 import { AxiosError } from "axios";
-import FiltroTable from "@/components/filtro-table";
 
 type StatusFiltro = "Todos" | "Nome";
 
-export default function Pacientes() {
-  const [data, setData] = useState<Paciente[]>([]);
+export default function Nefrologistas() {
+  const [data, setData] = useState<Medico[]>([]);
   const [isModal, setIsModal] = useState(false);
   const [acaoModal, setAcaoModal] = useState<"criar" | "editar">("criar");
-  const [itemID, setItemID] = useState(0);
-  const [busca, setBusca] = useState("");
   const [statusFiltro, setStatusFiltro] = useState<StatusFiltro>("Nome");
+  const [busca, setBusca] = useState("");
+  const [itemID, setItemID] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
-  const columns: ColumnDef<Paciente>[] = [
+  const columns: ColumnDef<Medico>[] = [
     {
       accessorKey: "nome",
       header: "Nome",
-    },
-    {
-      accessorKey: "cpf",
-      header: "CPF",
-      cell: ({ row }) => {
-        return <span>{formatarCPF(row.original.cpf)}</span>;
-      },
-    },
-    {
-      accessorKey: "telefone",
-      header: "Telefone",
-      cell: ({ row }) => {
-        return <span>{formatarTelefone(row.original.telefone)}</span>;
-      },
-    },
-    {
-      accessorKey: "uf",
-      header: "UF",
-    },
-    {
-      accessorKey: "municipio",
-      header: "Município",
-    },
-    {
-      accessorKey: "bairro",
-      header: "Bairro",
-    },
-    {
-      accessorKey: "rua",
-      header: "Rua",
-    },
-    {
-      accessorKey: "numero",
-      header: "Número",
     },
     {
       id: "actions",
@@ -73,16 +38,19 @@ export default function Pacientes() {
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
+              <Button
+                variant="ghost"
+                className="h-8 w-8 p-0 flex justify-self-end"
+              >
+                <span className="sr-only">Abrir menu</span>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-
             <DropdownMenuContent align="end">
               <DropdownMenuItem
                 onClick={() => {
-                  setItemID(row.original.id);
                   setAcaoModal("editar");
+                  setItemID(row.original.id);
                   setIsModal(true);
                 }}
               >
@@ -95,34 +63,38 @@ export default function Pacientes() {
     },
   ];
 
-  async function listar(busca: string = "", statusFiltro: string = "") {
+  async function listar(
+    tipo: "busca" | "filtro" | "" = "",
+    categoria: string = "",
+    busca: string = ""
+  ) {
     try {
-      const response = await consultarPacientes(
-        busca?.toUpperCase(),
-        statusFiltro?.toUpperCase()
-      );
+      setIsLoading(true);
+      const response = await consultarMedicos(1, busca, categoria);
       setData(response);
     } catch (error) {
       if (error instanceof AxiosError) {
         toast.error(
-          error.response?.data?.message ?? "Erro ao consultar paciente"
+          error.response?.data?.message ?? "Erro ao consultar médicos"
         );
       }
+    } finally {
+      setIsLoading(false);
     }
   }
 
   return (
     <>
-      <ModalPaciente
+      <ModalNefrologista
+        acao={acaoModal}
         isOpen={isModal}
         setIsOpen={setIsModal}
-        acao={acaoModal}
         reload={listar}
         id={itemID}
       />
       <main>
-        <section className="flex justify-between pb-1">
-          <FiltroTable
+        <section className="flex justify-between flex-wrap gap-2 pb-1">
+          <BuscarTable
             filtros={["Todos", "Nome"]}
             busca={busca}
             setBusca={setBusca}
@@ -138,7 +110,7 @@ export default function Pacientes() {
               }}
             >
               <Plus />
-              Criar novo paciente
+              Criar novo nefrologista
             </Button>
           </div>
         </section>
@@ -147,7 +119,7 @@ export default function Pacientes() {
           loading={isLoading}
           columns={columns}
           data={data}
-          emptyMessage={"Nenhum paciente encontrado."}
+          emptyMessage={"Nenhum nefrologista encontrado."}
         />
       </main>
     </>

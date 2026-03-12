@@ -74,12 +74,12 @@ const formSchema = z.object({
     .number()
     .nullable()
     .refine((v) => v !== null, "Obrigatório"),
-  situacao_clinica: z.string().toUpperCase().min(1, "Obrigatório"),
+  situacao_clinica: z.string().min(1, "Obrigatório"),
   ultimo_acesso: z.string().min(1, "Obrigatório"),
   ultimo_usv: z.string().min(1, "Obrigatório"),
   lesao_50: z.boolean().default(false),
   alteracao_clinica: z.boolean().default(false),
-  observacao: z.string().toUpperCase().optional(),
+  observacao: z.string().optional(),
 });
 
 export type FormFieldsAcompanhamento = z.infer<typeof formSchema>;
@@ -313,7 +313,7 @@ export default function ModalAcompanhamento({
                   placeholder="Buscar médico..."
                   value={field.value}
                   onChange={field.onChange}
-                  fetchFn={(v) => consultarMedicos(1, v, "NOME")}
+                  fetchFn={(v) => consultarMedicos(1, v, "Nome")}
                   initialData={initialRecord?.medico}
                 />
                 <FieldError errors={[fieldState.error]} />
@@ -329,7 +329,7 @@ export default function ModalAcompanhamento({
                 <FieldLabel>
                   Situação Clínica <span className="text-destructive">*</span>
                 </FieldLabel>
-                <Textarea className="uppercase" {...field} />
+                <Textarea {...field} />
                 <FieldError errors={[fieldState.error]} />
               </Field>
             )}
@@ -448,7 +448,7 @@ export default function ModalAcompanhamento({
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel>Observação</FieldLabel>
-                <Textarea className="uppercase" {...field} />
+                <Textarea {...field} />
                 <FieldError errors={[fieldState.error]} />
               </Field>
             )}
@@ -531,7 +531,7 @@ export function FormAsyncSelect({
     () =>
       debouncePromise(async (inputValue: string) => {
         if (!inputValue) return [];
-        const res = await fetchFn(inputValue.toUpperCase());
+        const res = await fetchFn(inputValue);
         const mapped = res.map((item: any) => ({
           value: item.id,
           label: item.nome ?? item.tipo ?? "...",

@@ -3,8 +3,9 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { consultarCateteres } from "@/service/api";
 import type { Cateter } from "@/types/cateter";
-import FiltroTable from "@/components/filtro-table";
+import BuscarTable from "@/components/buscar-table";
 import type { ColumnDef } from "@tanstack/react-table";
+import { AxiosError } from "axios";
 
 type StatusFiltro = "Todos" | "Tipo" | "Marca";
 
@@ -25,16 +26,21 @@ export default function Cateteres() {
     },
   ];
 
-  async function listar(busca: string = "", statusFiltro: string = "") {
+  async function listar(
+    tipo: "busca" | "filtro" | "" = "",
+    categoria: string = "",
+    busca: string = ""
+  ) {
     try {
       setIsLoading(true);
-      const response = await consultarCateteres(
-        busca?.toUpperCase(),
-        statusFiltro?.toUpperCase()
-      );
+      const response = await consultarCateteres(busca, categoria);
       setData(response);
     } catch (error) {
-      toast.error(error?.message);
+      if (error instanceof AxiosError) {
+        toast.error(
+          error.response?.data?.message ?? "Erro ao consultar cateteres"
+        );
+      }
     } finally {
       setIsLoading(false);
     }
@@ -44,7 +50,7 @@ export default function Cateteres() {
     <>
       <main>
         <section className="pb-1">
-          <FiltroTable
+          <BuscarTable
             filtros={["Todos", "Tipo", "Marca"]}
             busca={busca}
             setBusca={setBusca}

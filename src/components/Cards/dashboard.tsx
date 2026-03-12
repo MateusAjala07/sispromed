@@ -35,9 +35,9 @@ export default function CardDashboard({
           <CardAction>{icon}</CardAction>
         </CardHeader>
         <CardFooter className="flex px-6 [.border-t]:pt-6 flex-col items-start gap-1.5 text-sm">
-          <p className="text-muted-foreground">
+          <span className="text-muted-foreground">
             {loading ? <Skeleton className="w-30 h-3" /> : rodape}
-          </p>
+          </span>
         </CardFooter>
       </Card>
     </>

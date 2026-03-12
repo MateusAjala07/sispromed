@@ -122,7 +122,7 @@ function CustomToolbar({ label, onView, onNavigate, views }: any) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="flex items-center gap-1">
-                  {itemTexto.toUpperCase()}
+                  {itemTexto}
                   <ChevronDown className="w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -133,7 +133,7 @@ function CustomToolbar({ label, onView, onNavigate, views }: any) {
                       key={index}
                       onClick={() => onView(view) + setItemTexto(view)}
                     >
-                      {view.toUpperCase()}
+                      {view}
                     </DropdownMenuItem>
                     {index === 2 && <DropdownMenuSeparator />}
                   </>
